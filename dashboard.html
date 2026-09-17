@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="gambar/logo.png">
+    <link rel="apple-touch-icon" href="gambar/logo.png">
+    <title>Operator Command Center - MI AL KAHFI</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Hacker / Monospace Clean Style -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"Fira Code"', '"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        hacker: {
+                            bg: '#090d12',
+                            panel: '#0f172a',
+                            border: '#1e293b',
+                            accent: '#10b981',
+                            glow: '#059669',
+                            muted: '#64748b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            font-family: 'Fira Code', 'JetBrains Mono', monospace; 
+            background-color: #05080c;
+        }
+
+        /* Subtle Matrix Scanline Effect */
+        .scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(16, 185, 129, 0.03) 50%,
+                rgba(16, 185, 129, 0.03)
+            );
+            background-size: 100% 4px;
+        }
+
+        /* Hacker Glow Effects */
+        .cyber-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .cyber-card:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05080c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body class="text-slate-300 antialiased scanline selection:bg-emerald-500 selection:text-black">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR HACKER STYLE -->
+        <aside class="w-64 bg-[#090d12] text-slate-300 flex flex-col justify-between shrink-0 border-r border-emerald-900/30 relative z-20">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-5 border-b border-emerald-900/30 flex items-center gap-3 bg-[#05080c]">
+                    <div class="w-9 h-9 bg-emerald-950 border border-emerald-500/50 rounded flex items-center justify-center text-emerald-400 font-bold text-lg shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                        <i class="fa-solid fa-terminal"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm tracking-wider text-emerald-400 font-mono">MI_ALKAHFI_SYS</h1>
+                        <p class="text-[10px] text-emerald-600 font-semibold tracking-widest uppercase">[v2.0.26_STABLE]</p>
+                    </div>
+                </div>
+
+                <!-- Terminal Prompt Indicator -->
+                <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-900 text-[11px] text-slate-500 flex items-center gap-2 font-mono">
+                    <span class="text-emerald-500">root@mialkahfi:~#</span> status
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1.5 font-mono">
+                    <button onclick="switchTab('ringkasan')" id="nav-ringkasan" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/40 transition-all duration-200">
+                        <i class="fa-solid fa-chart-line text-xs"></i> ./ringkasan.sh
+                    </button>
+                    <button onclick="switchTab('berita')" id="nav-berita" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded text-xs font-semibold text-slate-400 hover:bg-slate-900 hover:text-emerald-400 border border-transparent hover:border-slate-800 transition-all duration-200">
+                        <i class="fa-solid fa-newspaper text-xs"></i> ./kelola_berita.py
+                    </button>
+                    
+                    <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded text-xs font-semibold text-slate-400 hover:bg-slate-900 hover:text-cyan-400 transition-all duration-200 mt-6 border-t border-slate-900">
+                        <i class="fa-solid fa-globe text-xs"></i> [Web Main Portal]
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="p-4 border-t border-emerald-900/20 bg-[#05080c]">
+                <a href="index.html" class="flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-950/30 rounded transition border border-rose-900/40 hover:border-rose-500/50">
+                    <i class="fa-solid fa-power-off"></i> EXIT_SESSION
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col overflow-y-auto bg-[#070b10] text-slate-300">
+            
+            <!-- Topbar -->
+            <header class="bg-[#090d12]/90 backdrop-blur-md border-b border-emerald-900/20 px-8 py-3.5 flex justify-between items-center sticky top-0 z-30 font-mono">
+                <div>
+                    <h2 id="page-title" class="text-sm font-bold text-emerald-400 tracking-wide flex items-center gap-2">
+                        <span class="text-slate-500">&gt;</span> <span id="title-text">RINGKASAN_DASHBOARD</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500">OPERATOR_ID: sysadmin_01 | HOST: 127.0.0.1</p>
+                </div>
+                
+                <!-- Hacker Style Status -->
+                <div class="flex items-center gap-3 bg-slate-950 border border-emerald-900/50 px-3 py-1.5 rounded text-xs">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <span class="text-[11px] text-emerald-400 font-bold tracking-wider">SYSTEM_ACTIVE</span>
+                </div>
+            </header>
+
+            <div class="p-8 space-y-6">
+
+                <!-- TAB 1: RINGKASAN STATISTIK & GRAFIK BERITA -->
+                <section id="tab-ringkasan" class="tab-content space-y-6">
+                    
+                    <!-- Banner Info Terminal -->
+                    <div class="cyber-card rounded-lg p-5 text-slate-300 border-l-4 border-l-emerald-500 relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/50 uppercase">[SYS_LOG] Command Center Ready</span>
+                                <h3 class="text-base font-bold text-white mt-2 font-mono">Monitor Publikasi & Rilis Berita</h3>
+                                <p class="text-xs text-slate-400 mt-1">Gunakan panel ini untuk meninjau status grafik statistik sebaran berita madrasah secara terpusat.</p>
+                            </div>
+                            <span class="text-xs text-emerald-500/40 font-mono hidden md:inline">&lt;/status_ok&gt;</span>
+                        </div>
+                    </div>
+
+                    <!-- Stat Cards (Hanya Statistik Berita & Sistem) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="cyber-card p-5 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400 uppercase tracking-wider font-mono">Total Berita Dirilis (Maks. 10)</p>
+                                <h3 id="stat-berita-count" class="text-3xl font-extrabold text-emerald-400 font-mono mt-1">0 / 10</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 rounded flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                        </div>
+
+                        <div class="cyber-card p-5 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400 uppercase tracking-wider font-mono">Status Server Website</p>
+                                <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2 mt-2 font-mono">
+                                    <i class="fa-solid fa-check-circle text-emerald-500"></i> ONLINE / NORMAL
+                                </h3>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 rounded flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHART SECTION: GRAFIK KATEGORI BERITA -->
+                    <div class="cyber-card p-6 rounded-lg">
+                        <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-800">
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-emerald-400 flex items-center gap-2 font-mono">
+                                <i class="fa-solid fa-chart-pie"></i> Distribusi Kategori Berita Terpublikasi
+                            </h4>
+                            <span class="text-[10px] bg-emerald-950 text-emerald-400 font-mono px-2 py-0.5 rounded border border-emerald-800/60">[LIVE_DATA]</span>
+                        </div>
+                        <div class="h-72 relative flex justify-center items-center">
+                            <canvas id="chartBerita"></canvas>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- TAB 2: KELOLA BERITA -->
+                <section id="tab-berita" class="tab-content hidden space-y-6">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        
+                        <!-- Form Tambah Berita -->
+                        <div class="cyber-card p-5 rounded-lg h-fit">
+                            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                                <h3 class="font-bold text-xs uppercase tracking-wider text-emerald-400 flex items-center gap-2 font-mono">
+                                    <i class="fa-solid fa-code-commit"></i> Input Berita Baru
+                                </h3>
+                                <span id="quota-badge" class="text-[10px] font-mono px-2 py-0.5 rounded border bg-emerald-950 text-emerald-400 border-emerald-800/50">
+                                    0/10 Slot
+                                </span>
+                            </div>
+                            
+                            <form id="form-berita" class="space-y-4 font-mono text-xs">
+                                <div>
+                                    <label class="block text-slate-400 mb-1">&gt; Judul Berita</label>
+                                    <input type="text" id="berita-judul" required placeholder="Judul tulisan..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-slate-200 focus:border-emerald-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-400 mb-1">&gt; Kategori</label>
+                                    <select id="berita-kategori" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-slate-200 focus:border-emerald-500 focus:outline-none">
+                                        <option value="Kegiatan">Kegiatan</option>
+                                        <option value="Prestasi">Prestasi</option>
+                                        <option value="Pengumuman">Pengumuman</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-400 mb-1">&gt; Upload Foto</label>
+                                    <input type="file" id="berita-gambar" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-mono file:bg-emerald-950 file:text-emerald-400 hover:file:bg-emerald-900 focus:outline-none cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-400 mb-1">&gt; Ringkasan</label>
+                                    <textarea id="berita-deskripsi" rows="3" required placeholder="Deskripsi singkat..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-slate-200 focus:border-emerald-500 focus:outline-none"></textarea>
+                                </div>
+                                <button type="submit" id="btn-submit-berita" class="w-full bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-500/50 font-bold py-2 rounded transition flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(16,185,129,0.1)] disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i class="fa-solid fa-upload"></i> PUBLISH_NEWS
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Daftar Berita Terpasang -->
+                        <div class="md:col-span-2 cyber-card p-5 rounded-lg">
+                            <h3 class="font-bold text-xs uppercase tracking-wider text-emerald-400 mb-4 pb-2 border-b border-slate-800 font-mono">Daftar Berita Aktif</h3>
+                            <div class="overflow-x-auto font-mono text-xs">
+                                <table class="w-full text-left text-slate-300">
+                                    <thead class="text-[11px] text-slate-500 uppercase bg-slate-950 border-b border-slate-800">
+                                        <tr>
+                                            <th class="py-2.5 px-3">Visual</th>
+                                            <th class="py-2.5 px-3">Judul</th>
+                                            <th class="py-2.5 px-3">Kategori</th>
+                                            <th class="py-2.5 px-3 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-berita-body" class="divide-y divide-slate-800/50">
+                                        <!-- Item Berita Dirender Lewat JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT SYSTEM -->
+    <script>
+        // 1. DATA INITIALIZATION / STORAGE CHECK
+        let dataBerita = JSON.parse(localStorage.getItem('mi_berita')) || [
+            { id: 1, judul: "Peringatan Hari Santri Nasional di MI Al Kahfi", kategori: "Kegiatan", deskripsi: "Kemeriahan santri dan siswa-siswi dalam merayakan Hari Santri...", tanggal: "22 Okt 2025", gambar: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop" },
+            { id: 2, judul: "Juara 1 Lomba Tahfidz Tingkat Kabupaten", kategori: "Prestasi", deskripsi: "Selamat kepada ananda yang berhasil membawa pulang piala...", tanggal: "15 Nov 2025", gambar: "https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop" },
+            { id: 3, judul: "Jadwal Ulangan Akhir Semester Ganjil", kategori: "Pengumuman", deskripsi: "Diberitahukan kepada seluruh wali murid terkait pelaksanaan UAS...", tanggal: "01 Des 2025", gambar: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop" }
+        ];
+
+        const MAX_BERITA = 10;
+
+        // Chart Instance
+        let chartBeritaInstance = null;
+
+        // 2. TAB SWITCHING LOGIC
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/40');
+                el.classList.add('text-slate-400', 'border-transparent');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            activeNav.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/40');
+            activeNav.classList.remove('text-slate-400', 'border-transparent');
+
+            const titles = {
+                'ringkasan': 'RINGKASAN_DASHBOARD',
+                'berita': 'KELOLA_UPDATE_BERITA'
+            };
+            document.getElementById('title-text').innerText = titles[tabName];
+        }
+
+        // 3. CHART INITIALIZATION
+        function updateCharts() {
+            const categoryCounts = { 'Kegiatan': 0, 'Prestasi': 0, 'Pengumuman': 0 };
+            dataBerita.forEach(b => {
+                if(categoryCounts[b.kategori] !== undefined) categoryCounts[b.kategori]++;
+            });
+
+            const ctxBerita = document.getElementById('chartBerita').getContext('2d');
+            if(chartBeritaInstance) chartBeritaInstance.destroy();
+
+            chartBeritaInstance = new Chart(ctxBerita, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCounts),
+                    datasets: [{
+                        data: Object.values(categoryCounts),
+                        backgroundColor: ['#10b981', '#06b6d4', '#f59e0b'],
+                        borderColor: '#0f172a',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#94a3b8', 
+                                font: { family: 'Fira Code', size: 11 },
+                                padding: 20
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // 4. RENDER FUNCTION
+        function renderAll() {
+            // Render Berita Table
+            const beritaBody = document.getElementById('table-berita-body');
+            beritaBody.innerHTML = '';
+            
+            if (dataBerita.length === 0) {
+                beritaBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-500">Belum ada data berita.</td></tr>`;
+            } else {
+                dataBerita.forEach((item, index) => {
+                    beritaBody.innerHTML += `
+                        <tr class="hover:bg-slate-900/50 transition">
+                            <td class="py-2.5 px-3">
+                                <img src="${item.gambar}" class="w-10 h-10 object-cover rounded border border-slate-700">
+                            </td>
+                            <td class="py-2.5 px-3">
+                                <div class="font-bold text-slate-200 line-clamp-1">${item.judul}</div>
+                                <div class="text-[10px] text-slate-500">${item.tanggal}</div>
+                            </td>
+                            <td class="py-2.5 px-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-900 text-emerald-400 border border-emerald-900/50">
+                                    ${item.kategori}
+                                </span>
+                            </td>
+                            <td class="py-2.5 px-3 text-center">
+                                <button onclick="deleteBerita(${item.id})" class="text-rose-400 hover:text-rose-300 p-1">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Update Counts & Status Limit
+            const count = dataBerita.length;
+            document.getElementById('stat-berita-count').innerText = `${count} / ${MAX_BERITA}`;
+            
+            const quotaBadge = document.getElementById('quota-badge');
+            const submitBtn = document.getElementById('btn-submit-berita');
+            
+            quotaBadge.innerText = `${count}/${MAX_BERITA} Slot`;
+
+            if (count >= MAX_BERITA) {
+                quotaBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded border bg-rose-950 text-rose-400 border-rose-800/50";
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> KUOTA_PENUH`;
+            } else {
+                quotaBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded border bg-emerald-950 text-emerald-400 border-emerald-800/50";
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-upload"></i> PUBLISH_NEWS`;
+            }
+
+            // Refresh Chart
+            updateCharts();
+        }
+
+        // 5. EVENT HANDLERS
+        document.getElementById('form-berita').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // VALIDASI BATASAN 10 BERITA
+            if (dataBerita.length >= MAX_BERITA) {
+                alert('[SYSTEM_ERROR]: Batas maksimum upload berita (10 berita) telah tercapai. Hapus beberapa berita lama terlebih dahulu untuk menambah berita baru.');
+                return;
+            }
+
+            const judul = document.getElementById('berita-judul').value;
+            const kategori = document.getElementById('berita-kategori').value;
+            const deskripsi = document.getElementById('berita-deskripsi').value;
+            const gambarInput = document.getElementById('berita-gambar');
+
+            const date = new Date();
+            const formattedDate = `${date.getDate()} ${date.toLocaleString('id-ID', { month: 'short' })} ${date.getFullYear()}`;
+
+            const saveBerita = (gambarUrl) => {
+                const newBerita = {
+                    id: Date.now(),
+                    judul,
+                    kategori,
+                    deskripsi,
+                    tanggal: formattedDate,
+                    gambar: gambarUrl || "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop"
+                };
+
+                dataBerita.unshift(newBerita);
+                localStorage.setItem('mi_berita', JSON.stringify(dataBerita));
+                renderAll();
+                document.getElementById('form-berita').reset();
+            };
+
+            if (gambarInput.files && gambarInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    saveBerita(e.target.result);
+                };
+                reader.readAsDataURL(gambarInput.files[0]);
+            } else {
+                saveBerita();
+            }
+        });
+
+        function deleteBerita(id) {
+            if(confirm('[SYSTEM_CONFIRM]: Hapus berita ini?')) {
+                dataBerita = dataBerita.filter(b => b.id !== id);
+                localStorage.setItem('mi_berita', JSON.stringify(dataBerita));
+                renderAll();
+            }
+        }
+
+        // INIT
+        window.onload = () => {
+            renderAll();
+        };
+    </script>
+</body>
+</html>

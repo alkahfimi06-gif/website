@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="gambar/logo.png">
+    <link rel="apple-touch-icon" href="gambar/logo.png">
+    <title>MI Al-Kahfi Purbasana</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Poppins & Amiri for Islamic Vibes) -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- AOS (Animate On Scroll) Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .font-arabic { font-family: 'Amiri', serif; }
+
+        /* Custom Keyframe Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+
+        @keyframes rotate3D {
+            0% { transform: rotateY(0deg) rotateX(10deg); }
+            100% { transform: rotateY(360deg) rotateX(10deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.08); }
+        }
+
+        .animate-float {
+            animation: floatSlow 6s ease-in-out infinite;
+        }
+
+        .animate-rotate-3d {
+            animation: rotate3D 20s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        /* Card 3D Effect */
+        .card-3d {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(4deg) rotateY(-2deg);
+            box-shadow: 0 20px 30px -10px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Custom Pattern Islamic Star */
+        .islamic-star {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white overflow-x-hidden">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full bg-slate-900/80 backdrop-blur-xl z-50 border-b border-emerald-500/20 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                
+                <!-- Logo & Nama Sekolah -->
+                <a href="#beranda" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-300"></div>
+                        <img src="gambar/logo.png" alt="Logo MI Al Kahfi Purbasana" class="relative w-12 h-12 object-contain group-hover:scale-110 transition duration-300">
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-white block leading-tight group-hover:text-emerald-400 transition">MI AL-KAHFI PURBASANA</span>
+                        <span class="text-xs text-emerald-400 font-medium tracking-wider block">KECAMATAN TARUB KABUPATEN TEGAL</span>
+                    </div>
+                </a>
+
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex space-x-8 text-sm font-semibold items-center text-slate-300">
+                    <a href="#beranda" class="text-emerald-400 hover:text-emerald-300 transition">Beranda</a>
+                    
+                    <!-- Dropdown Profil -->
+                    <div class="relative group">
+                        <button class="hover:text-emerald-400 transition flex items-center gap-1 py-2 focus:outline-none">
+                            Profil <i class="fa-solid fa-chevron-down text-xs ml-1 group-hover:rotate-180 transition-transform duration-200"></i>
+                        </button>
+                        <div class="absolute left-0 top-full hidden group-hover:block w-52 bg-slate-800/95 backdrop-blur-xl shadow-2xl rounded-2xl border border-emerald-500/20 py-3 z-50 transition-all duration-300">
+                            <a href="#profil" class="block px-4 py-2.5 text-slate-200 hover:bg-emerald-500/10 hover:text-emerald-400 transition">
+                                <i class="fa-solid fa-school text-emerald-400 mr-2"></i>Profil Sekolah
+                            </a>
+                            <a href="#visi-misi" class="block px-4 py-2.5 text-slate-200 hover:bg-emerald-500/10 hover:text-emerald-400 transition">
+                                <i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i>Visi & Misi
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="#keunggulan" class="hover:text-emerald-400 transition">Keunggulan</a>
+                    <a href="pustaka.html" class="hover:text-emerald-400 transition flex items-center gap-1">
+                        <i class="fa-solid fa-book-bookmark text-emerald-400"></i> Perpustakaan
+                    </a>
+                    <a href="#berita" class="hover:text-emerald-400 transition">Berita</a>
+                    <a href="#kontak" class="hover:text-emerald-400 transition">Kontak</a>
+                </div>
+
+                <!-- Tombol Login Admin Desktop -->
+                <div class="hidden md:block">
+                    <a href="dashboard.html" id="open-login-btn" class="relative group overflow-hidden rounded-full p-0.5 font-semibold text-sm inline-block">
+                        <span class="absolute inset-0 bg-gradient-to-r from-amber-400 to-emerald-500 rounded-full group-hover:opacity-100 transition duration-300"></span>
+                        <span class="relative px-5 py-2.5 bg-slate-900 rounded-full block text-amber-400 group-hover:bg-opacity-0 group-hover:text-white transition duration-300">
+                            <i class="fa-solid fa-user-gear mr-2"></i>Login Admin
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="menu-btn" class="text-slate-300 hover:text-emerald-400 focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 backdrop-blur-xl border-b border-emerald-500/20 px-4 pt-2 pb-4 space-y-3">
+            <a href="#beranda" class="block text-emerald-400 font-medium">Beranda</a>
+            <div class="space-y-1 pl-2 border-l-2 border-emerald-500">
+                <span class="block text-xs font-bold uppercase text-slate-400">Profil</span>
+                <a href="#profil" class="block text-slate-300 hover:text-emerald-400 text-sm">Profil Sekolah</a>
+                <a href="#visi-misi" class="block text-slate-300 hover:text-emerald-400 text-sm">Visi & Misi</a>
+            </div>
+            <a href="#keunggulan" class="block text-slate-300 hover:text-emerald-400">Keunggulan</a>
+            <a href="pustaka.html" class="block text-slate-300 hover:text-emerald-400"><i class="fa-solid fa-book-bookmark text-emerald-400 mr-1"></i> Perpustakaan Digital</a>
+            <a href="#berita" class="block text-slate-300 hover:text-emerald-400">Berita</a>
+            <a href="#kontak" class="block text-slate-300 hover:text-emerald-400">Kontak</a>
+            <a href="dashboard.html" id="open-login-mobile-btn" class="w-full text-center bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl font-semibold block transition">
+                <i class="fa-solid fa-user-gear mr-1"></i> Login Admin
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION (Islamic & 3D Visual Effects) -->
+    <section id="beranda" class="pt-32 pb-24 md:pt-40 md:pb-36 bg-slate-950 text-white relative overflow-hidden">
+        <!-- Background Ambient Glow & Glow Blobs -->
+        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-tr from-emerald-600/20 to-teal-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse-glow"></div>
+
+        <!-- 3D Geometric Rotating Islamic Ornament (Background Art) -->
+        <div class="absolute -right-20 top-20 w-[450px] h-[450px] opacity-10 pointer-events-none hidden lg:block animate-rotate-3d">
+            <div class="w-full h-full border-2 border-emerald-400 rotate-45 flex items-center justify-center">
+                <div class="w-3/4 h-3/4 border-2 border-amber-400 rotate-45 flex items-center justify-center">
+                    <div class="w-1/2 h-1/2 border-2 border-emerald-300 rotate-45"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animated Floating Calligraphy Graphic / Emblem -->
+        <div class="absolute top-28 left-8 text-emerald-500/10 font-arabic text-8xl pointer-events-none animate-float">
+            ﷽
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                
+                <div class="space-y-6 text-center md:text-left" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="inline-flex items-center gap-2 bg-emerald-950/80 border border-emerald-500/30 px-4 py-2 rounded-full backdrop-blur-md shadow-lg">
+                        <i class="fa-solid fa-star-and-crescent text-amber-400 text-sm"></i>
+                        <span class="text-emerald-300 text-xs font-semibold uppercase tracking-wider">Pendidikan Islami & Modern</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight">
+                        Membentuk Generasi <br>
+                        <span class="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">Rabbani</span> & Berprestasi
+                    </h1>
+
+                    <p class="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
+                        MI Al-Kahfi Purbasana berkomitmen melahirkan generasi unggul dalam ilmu pengetahuan umum, berakhlaqul karimah, serta teguh berpegang pada Al-Qur'an.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
+                        <a href="gambar/ppdb_online.html" class="relative group px-8 py-4 rounded-full font-bold text-white overflow-hidden shadow-xl shadow-amber-500/10 hover:shadow-amber-500/30 transition">
+                            <span class="absolute inset-0 bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 group-hover:scale-105 transition duration-300"></span>
+                            <span class="relative flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-xs"></i> Daftar PPDB Online
+                            </span>
+                        </a>
+                        <a href="#profil" class="bg-slate-800/80 hover:bg-slate-700/80 text-white border border-slate-700 px-8 py-4 rounded-full font-semibold transition backdrop-blur-md text-center">
+                            Jelajahi Profil
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3D Photo Display Frame -->
+                <div class="relative flex justify-center" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="relative w-full max-w-md">
+                        <!-- Glow Aura -->
+                        <div class="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-amber-500 rounded-3xl blur-2xl opacity-30 animate-pulse"></div>
+                        
+                        <!-- Main Frame -->
+                        <div class="relative rounded-3xl overflow-hidden border border-emerald-500/30 shadow-2xl bg-slate-900 group">
+                            <img src="gambar/gambar 3.jpeg" alt="Kegiatan MI Al Kahfi Purbasana" class="w-full h-auto object-cover transform group-hover:scale-110 transition duration-700">
+                            
+                            <!-- Floating Badge 3D Overlay -->
+                            <div class="absolute bottom-4 left-4 right-4 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-mosque"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-slate-400">Berdiri Sejak</p>
+                                        <p class="text-sm font-bold text-white">Tahun 1985</p>
+                                    </div>
+                                </div>
+                                <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full border border-emerald-500/30">
+                                    Akreditasi A
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- HIGHLIGHT STATISTIK (3D Floating Cards) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20" data-aos="zoom-in" data-aos-duration="800">
+        <div class="bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl grid grid-cols-2 md:grid-cols-4 gap-6 p-8 border border-emerald-500/20 text-center">
+            <div class="border-r border-slate-700/60 last:border-none p-2">
+                <h3 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">167+</h3>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1 font-medium">Siswa Aktif</p>
+            </div>
+            <div class="border-r border-slate-700/60 last:border-none p-2">
+                <h3 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">10+</h3>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1 font-medium">Guru & Staf Pengajar</p>
+            </div>
+            <div class="border-r border-slate-700/60 last:border-none p-2">
+                <h3 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">100%</h3>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1 font-medium">Lulusan Berkualitas</p>
+            </div>
+            <div class="p-2">
+                <h3 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">5+</h3>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1 font-medium">Ekstrakurikuler</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROFIL SEKOLAH SECTION -->
+    <section id="profil" class="py-24 bg-slate-900 text-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                
+                <div class="md:col-span-4 flex flex-col items-center" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="w-full bg-slate-800/80 p-5 rounded-3xl shadow-xl border border-emerald-500/20 text-center relative card-3d">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs px-4 py-1.5 rounded-full font-bold shadow-lg z-10">
+                            Kepala Madrasah
+                        </div>
+                        <div class="w-full h-80 overflow-hidden rounded-2xl mt-3 mb-4 bg-slate-950 shadow-inner">
+                            <img src="gambar/gambar 2.png" alt="Kepala MI Al-Kahfi Purbasana" class="w-full h-full object-cover object-top hover:scale-105 transition duration-500">
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Muhammad Izzur Rizqi, S.Ag</h4>
+                        <p class="text-xs text-emerald-400 font-medium mt-1">NIP. -</p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-8 space-y-6" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase block mb-2">Tentang Kami</span>
+                        <h3 class="text-3xl sm:text-4xl font-bold text-white mb-4">Profil MI Al-Kahfi Purbasana</h3>
+                        <p class="text-slate-300 leading-relaxed mb-4 font-light">
+                            MI Al-Kahfi Purbasana merupakan lembaga pendidikan Islam yang berdedikasi memberikan pendidikan berkualitas tinggi, menyeimbangkan ilmu pengetahuan umum serta nilai-nilai keislaman secara baik. Berdiri sejak tahun 1985, madrasah terus berinovasi dalam mendidik generasi muda yang sopan santu, disiplin, dan bertanggung jawab serta berprestasi disemua bidang.
+                        </p>
+                        <p class="text-slate-300 leading-relaxed font-light">
+                            Dengan lingkungan belajar yang kondusif, sarana modern, serta tenaga pengajar yang berkompeten, kami siap membimbing siswa-siswi menjadi pribadi beriman, bertakwa, dan berakhlak mulia.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-6 rounded-2xl border border-emerald-500/20 backdrop-blur-md">
+                        <h4 class="text-base font-bold text-emerald-400 mb-4 border-b border-slate-700/60 pb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-kaaba text-amber-400"></i> Informasi Madrasah
+                        </h4>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between border-b border-slate-700/40 pb-2">
+                                <span class="text-slate-400">Nama Lembaga</span>
+                                <span class="font-semibold text-white">MI Al-Kahfi Purbasana</span>
+                            </li>
+                            <li class="flex justify-between border-b border-slate-700/40 pb-2">
+                                <span class="text-slate-400">Status</span>
+                                <span class="font-semibold text-emerald-400">Swasta</span>
+                            </li>
+                            <li class="flex justify-between border-b border-slate-700/40 pb-2">
+                                <span class="text-slate-400">Akreditasi</span>
+                                <span class="font-semibold text-amber-400">A (Sangat Baik)</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-slate-400">Alamat</span>
+                                <span class="font-semibold text-white text-right">Jl.Karagaji Desa Purbasana Kecamatan Tarub Kabupaten Tegal</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- VISI & MISI SECTION -->
+    <section id="visi-misi" class="py-24 bg-slate-950 text-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase block mb-2">Arah & Tujuan</span>
+                <h3 class="text-3xl sm:text-4xl font-bold">Visi & Misi</h3>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-8">
+                <!-- Visi Card -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-8 sm:p-10 rounded-3xl border border-emerald-500/30 shadow-2xl relative overflow-hidden card-3d" data-aos="fade-up">
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                    <div class="w-12 h-12 bg-emerald-500 text-slate-950 rounded-2xl flex items-center justify-center text-xl mb-4 font-bold shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-emerald-400 mb-3">Visi</h4>
+                    <blockquote class="text-slate-200 italic border-l-4 border-amber-400 pl-4 py-2 font-medium text-lg leading-relaxed">
+                        "Terwujudnya Generasi Islam yang Unggul dalam Prestasi, Berakhlaqul Karimah, serta Berlandaskan Al-Qur'an."
+                    </blockquote>
+                </div>
+
+                <!-- Misi Card -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-8 sm:p-10 rounded-3xl border border-emerald-500/30 shadow-2xl card-3d" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 bg-amber-400 text-slate-950 rounded-2xl flex items-center justify-center text-xl mb-4 font-bold shadow-lg shadow-amber-400/20">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-amber-400 mb-6">Misi</h4>
+                    <ul class="space-y-4 text-slate-300 text-sm sm:text-base">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Menyelenggarakan pendidikan agama Islam yang kuat dan berkarakter sejak dini.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Meningkatkan mutu pembelajaran ilmu pengetahuan umum dan teknologi secara berkesinambungan.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Membimbing siswa dalam hafalan (Tahfidz) Al-Qur'an Juz 30 serta pemahaman adab Islami.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Mengembangkan bakat, minat, dan potensi peserta didik melalui kegiatan ekstrakurikuler.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tujuan Card -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-8 sm:p-10 rounded-3xl border border-emerald-500/30 shadow-2xl card-3d" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 bg-amber-400 text-slate-950 rounded-2xl flex items-center justify-center text-xl mb-4 font-bold shadow-lg shadow-amber-400/20">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-amber-400 mb-6">Tujuan</h4>
+                    <ul class="space-y-4 text-slate-300 text-sm sm:text-base">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Melestarikan budaya membaca al-qur'an disetiap pagi 15 menit sebelum pelajaran</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Menumbuhkan rasa tanggung jawab dan jujur terhadap siswa dan siswi disetiap tindakan</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Membiasakan budaya 3S (Salam, Sapa & Senyum)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0"></i>
+                            <span class="leading-relaxed">Serta mencetak lulusan yang baik, berprestasi serta amanah disetiap kegiatan yang dijalani atau di embannya.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- KEUNGGULAN SECTION (3D Cards Effect) -->
+    <section id="keunggulan" class="py-24 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase block mb-2">Keunggulan</span>
+                <h3 class="text-3xl sm:text-4xl font-bold">Mengapa Memilih Kami</h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-slate-800/80 p-8 rounded-3xl border border-emerald-500/20 card-3d group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-500 group-hover:text-slate-950 transition duration-300">
+                        <i class="fa-solid fa-book-quran"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Tahfidz Al-Qur'an</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Menghafal Al-Qur'an Juz 30 dengan metode menyenangkan, tajwid yang benar, dan bimbingan ustaz/ustazah berpengalaman.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-slate-800/80 p-8 rounded-3xl border border-emerald-500/20 card-3d group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-amber-400 group-hover:text-slate-950 transition duration-300">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Kurikulum Terintegrasi</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Menggabungkan Kurikulum Nasional dengan pendidikan keislaman untuk menyeimbangkan intelektual dan spiritual.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-slate-800/80 p-8 rounded-3xl border border-emerald-500/20 card-3d group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-500 group-hover:text-slate-950 transition duration-300">
+                        <i class="fa-solid fa-campground"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Pramuka Karakter</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Melatih ketangkasan, kemandirian, dan kepedulian sosial siswa sesuai nilai Dasa Dharma Pramuka.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-slate-800/80 p-8 rounded-3xl border border-emerald-500/20 card-3d group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-amber-400 group-hover:text-slate-950 transition duration-300">
+                        <i class="fa-solid fa-drum"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Marching Band</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Ekstrakurikuler musik untuk mengasah kekompakan, ritme, dan kreativitas seni siswa.
+                    </p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bg-slate-800/80 p-8 rounded-3xl border border-emerald-500/20 card-3d group" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-500 group-hover:text-slate-950 transition duration-300">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Pembiasaan Akhlak</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Pembiasaan adab harian, salat Dhuha & Dzuhur berjamaah, serta penanaman kasih sayang antar-sesama.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BERITA TERBARU SECTION -->
+    <section id="berita" class="py-24 bg-slate-950 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-end mb-12" data-aos="fade-up">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase block mb-2">Informasi Terbaru</span>
+                    <h3 class="text-3xl font-bold">Kegiatan & Berita Madrasah</h3>
+                </div>
+                <a href="#berita" class="hidden md:flex items-center gap-2 text-emerald-400 font-semibold hover:text-emerald-300 transition">
+                    Lihat Semua <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+
+            <!-- CONTAINER BERITA DINAMIS -->
+            <div id="berita-container" class="grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="200">
+                <!-- Data berita otomatis di-render via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="kontak" class="bg-slate-950 text-slate-400 pt-16 pb-8 border-t border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 pb-12 border-b border-slate-800/60">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <img src="gambar/logo.png" alt="Logo MI Al Kahfi Purbasana" class="w-10 h-10 object-contain">
+                        <span class="text-lg font-bold text-white">MI AL-KAHFI PURBASANA</span>
+                    </div>
+                    <p class="text-sm text-slate-400">Mewujudkan generasi Islam yang cerdas, mandiri, dan berakhlaqul karimah.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Navigasi Cepat</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#beranda" class="hover:text-emerald-400 transition">Beranda</a></li>
+                        <li><a href="#profil" class="hover:text-emerald-400 transition">Profil Madrasah</a></li>
+                        <li><a href="#visi-misi" class="hover:text-emerald-400 transition">Visi & Misi</a></li>
+                        <li><a href="#keunggulan" class="hover:text-emerald-400 transition">Keunggulan</a></li>
+                        <li><a href="#berita" class="hover:text-emerald-400 transition">Berita & Kegiatan</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Layanan & Akses</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="gambar/ppdb_online.html" class="hover:text-emerald-400 transition">PPDB Online</a></li>
+                        <li><a href="pustaka.html" class="hover:text-emerald-400 transition">Perpustakaan Digital</a></li>
+                        <li><a href="dashboard.html" id="footer-login-btn" class="hover:text-emerald-400 transition">Portal Admin</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Kontak Kami</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot text-emerald-400 mt-1"></i>
+                            <span>Desa Purbasana,Kec.Tarub,Kab.Tegal,Jawa Tengah</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-emerald-400"></i>
+                            <span>mialkahfipurbasana@gmail.com</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-emerald-400"></i>
+                            <span>+62 812-2672-5623 (Kepala Madrasah)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-emerald-400"></i>
+                            <span>+62 877-0641-0398 (Guru Kelas)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-emerald-400"></i>
+                            <span>+62 823-2206-6549 (Guru Kelas)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 text-center text-xs text-slate-500">
+                <p>&copy; 2026 Abdurahman Wahid. Hak Cipta Dilindungi Undang-Undang.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT ANIMASI & INTEGRASI SINKRONISASI BERITA LOCALSTORAGE -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inisialisasi AOS (Animate On Scroll)
+        AOS.init({
+            once: true,
+            duration: 800
+        });
+
+        // Toggle Mobile Menu
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Fungsi Render Berita dari LocalStorage (Di-upload via Dashboard Admin)
+        function renderBerita() {
+            const container = document.getElementById('berita-container');
+            if (!container) return;
+
+            const beritaList = JSON.parse(localStorage.getItem('mi_berita')) || [];
+
+            if (beritaList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-slate-900/60 rounded-3xl border border-slate-800">
+                        <i class="fa-solid fa-newspaper text-4xl text-slate-600 mb-3"></i>
+                        <p class="text-slate-400">Belum ada berita atau kegiatan yang dipublikasikan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Urutkan berita dari yang terbaru
+            const sortedBerita = [...beritaList].reverse();
+
+            container.innerHTML = sortedBerita.map(item => `
+                <article class="bg-slate-900/90 rounded-3xl border border-emerald-500/20 overflow-hidden shadow-xl card-3d flex flex-col justify-between">
+                    <div>
+                        <div class="relative h-48 overflow-hidden bg-slate-950">
+                            <img src="${item.gambar || 'gambar/gambar 3.jpeg'}" alt="${item.judul}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-4 left-4 bg-emerald-500 text-slate-950 font-bold text-xs px-3 py-1 rounded-full uppercase shadow-md">
+                                ${item.kategori || 'Kegiatan'}
+                            </span>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 text-xs text-slate-400 mb-3">
+                                <i class="fa-regular fa-calendar text-emerald-400"></i>
+                                <span>${item.tanggal || 'Terbaru'}</span>
+                            </div>
+                            <h4 class="font-bold text-lg text-white mb-2 line-clamp-2 hover:text-emerald-400 transition cursor-pointer">
+                                ${item.judul}
+                            </h4>
+                            <p class="text-slate-400 text-sm line-clamp-3 leading-relaxed">
+                                ${item.ringkasan || item.isi || ''}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6 pt-2">
+                        <button class="text-emerald-400 text-sm font-semibold hover:text-emerald-300 transition inline-flex items-center gap-1">
+                            Baca Selengkapnya <i class="fa-solid fa-chevron-right text-xs ml-1"></i>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Jalankan render saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', renderBerita);
+    </script>
+    <!-- MODAL LOGIN ADMIN -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/30 w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+            <!-- Tombol Close Modal -->
+            <button id="close-login-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Header Modal -->
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">Login Admin</h3>
+                <p class="text-xs text-slate-400 mt-1">Masukkan kredensial untuk mengakses Dashboard</p>
+            </div>
+
+            <!-- Pesan Error -->
+            <div id="login-error" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/40 rounded-xl text-red-400 text-xs text-center">
+                Username atau password salah!
+            </div>
+
+            <!-- Form Login -->
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-user text-sm"></i>
+                        </span>
+                        <input type="text" id="admin-username" required class="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500 transition" placeholder="Masukkan username">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="admin-password" required class="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500 transition" placeholder="Masukkan password">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition duration-300 mt-2">
+                    Masuk ke Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT KONTROL MODAL LOGIN -->
+    <script>
+        const loginModal = document.getElementById('login-modal');
+        const openBtn = document.getElementById('open-login-btn');
+        const openMobileBtn = document.getElementById('open-login-mobile-btn');
+        const closeBtn = document.getElementById('close-login-btn');
+        const loginForm = document.getElementById('admin-login-form');
+        const loginError = document.getElementById('login-error');
+
+        // Buka Modal
+        const showModal = (e) => {
+            e.preventDefault();
+            loginModal.classList.remove('hidden');
+            loginModal.classList.add('flex');
+        };
+
+        if(openBtn) openBtn.addEventListener('click', showModal);
+        if(openMobileBtn) openMobileBtn.addEventListener('click', showModal);
+
+        // Tutup Modal
+        closeBtn.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            loginModal.classList.remove('flex');
+            loginError.classList.add('hidden');
+        });
+
+        // Verifikasi Form Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+
+            // Kredensial default: admin / admin123 (Silakan sesuaikan kebutuhan)
+            if(username === 'admin' && password === 'admin123') {
+                window.location.href = 'dashboard.html';
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

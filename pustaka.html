@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="gambar/logo.png">
+    <link rel="apple-touch-icon" href="gambar/logo.png">
+    <title>Perpustakaan Digital - MI Al-Kahfi Purbasana</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- HTML5-QRCode Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Three.js CDN untuk Animasi 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .islamic-pattern-overlay {
+            background-color: rgba(248, 250, 252, 0.85);
+            background-image: radial-gradient(#059669 0.75px, transparent 0.75px), radial-gradient(#059669 0.75px, #f8fafc 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            background-attachment: fixed;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="islamic-pattern-overlay text-slate-800 min-h-screen relative">
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-40 shadow-sm border-b border-emerald-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md shadow-emerald-200 overflow-hidden border-2 border-emerald-500">
+                        <img id="navbarLogoImg" src="gambar/logo.png" alt="Logo MI Al-Kahfi" class="w-full h-full object-cover" onerror="this.onerror=null; this.classList.add('hidden'); document.getElementById('navbarLogoIcon').classList.remove('hidden');">
+                        <i id="navbarLogoIcon" class="fa-solid fa-mosque hidden"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold text-emerald-900 block leading-tight">MI AL-KAHFI PURBASANA</span>
+                        <span class="text-xs text-emerald-600 font-medium tracking-wider">KECAMATAN TARUB KABUPATEN TEGAL</span>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex space-x-8 text-sm font-semibold">
+                    <a href="index.html" class="text-gray-600 hover:text-emerald-600 transition">Beranda</a>
+                    <a href="pustaka.html" class="text-emerald-600 transition">Perpustakaan</a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button id="authBtn" onclick="handleAuthClick()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-user-lock"></i> <span id="authBtnText">Login Admin</span>
+                    </button>
+                    <a href="index.html" class="text-emerald-600 hover:text-emerald-700 font-semibold text-sm hidden sm:block">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Beranda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER SECTION -->
+    <section class="pt-28 pb-12 bg-gradient-to-r from-emerald-900/90 via-teal-900/90 to-emerald-800/90 backdrop-blur-sm text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <span class="bg-emerald-700/60 border border-emerald-500/30 text-emerald-200 text-xs px-4 py-1.5 rounded-full uppercase font-semibold tracking-wider">E-Pustaka MI Al-Kahfi Purbasana</span>
+            <h1 class="text-3xl sm:text-4xl font-extrabold mt-3 drop-shadow-md">Perpustakaan MI Al-Kahfi Purbasana</h1>
+            <div class="max-w-2xl mx-auto mt-2">
+                <marquee direction="left" scrollamount="6" class="text-emerald-100 text-sm sm:text-base font-medium">اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ — Membaca adalah sumber pengetahuan dan pintu wawasan.</marquee>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANEL ADMIN -->
+    <section id="adminPanel" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 hidden relative z-10">
+        <div class="bg-amber-50/90 backdrop-blur-md border border-amber-200 rounded-2xl p-6 shadow-sm mb-8">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-amber-200">
+                <h2 class="text-lg font-bold text-amber-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-amber-600"></i> Control Panel Admin Perpustakaan
+                </h2>
+                <span class="bg-amber-200 text-amber-800 text-xs px-3 py-1 rounded-full font-semibold">Mode Kelola</span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Form Tambah Buku Baru & Pengaturan Logo -->
+                <div class="space-y-6">
+                    <!-- Form Upload Logo Madrasah -->
+                    <div class="bg-white/90 backdrop-blur-sm p-5 rounded-xl border border-amber-100 shadow-sm">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-image text-emerald-600"></i> Pengaturan Logo Madrasah
+                        </h3>
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="font-medium text-slate-600">Upload Logo Baru (File Gambar)</label>
+                                <input type="file" id="inputLogoFile" accept="image/*" onchange="gantiLogoMadrasah(event)" class="w-full mt-1 p-1.5 border rounded-lg text-xs bg-white focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <p class="text-[10px] text-slate-500">*Logo ini akan digunakan pada Header Sistem & Kop Laporan Cetak.</p>
+                        </div>
+                    </div>
+
+                    <!-- Form Tambah Buku Baru -->
+                    <div class="bg-white/90 backdrop-blur-sm p-5 rounded-xl border border-amber-100 shadow-sm">
+                        <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-emerald-600"></i> Tambah Buku Baru
+                        </h3>
+                        <form onsubmit="tambahBuku(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="font-medium text-slate-600">Judul Buku</label>
+                                <input type="text" id="addJudul" required placeholder="Contoh: Sejarah Kebudayaan Islam" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <label class="font-medium text-slate-600">Penulis / Pengarang</label>
+                                <input type="text" id="addPenulis" required placeholder="Contoh: Ahmad Subagja" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:border-emerald-500">
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="font-medium text-slate-600">Kategori</label>
+                                    <select id="addKategori" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:border-emerald-500">
+                                        <option value="Agama">Agama</option>
+                                        <option value="Pelajaran">Pelajaran</option>
+                                        <option value="Pengetahuan">Pengetahuan</option>
+                                        <option value="Cerita">Cerita/Sastra</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="font-medium text-slate-600">Stok Awal</label>
+                                    <input type="number" id="addStok" required min="1" value="5" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="font-medium text-slate-600">Harga Buku (Rp)</label>
+                                    <input type="number" id="addHarga" required min="0" value="35000" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="font-medium text-slate-600">Upload Foto Sampul (Dari Laptop)</label>
+                                <input type="file" id="addGambar" accept="image/*" class="w-full mt-1 p-1.5 border rounded-lg focus:outline-none focus:border-emerald-500 text-xs bg-white">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition mt-2">
+                                <i class="fa-solid fa-upload mr-1"></i> Upload & Publikasikan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Laporan Peminjaman Buku -->
+                <div class="lg:col-span-2 bg-white/90 backdrop-blur-sm p-5 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-file-invoice text-emerald-600"></i> Laporan Peminjaman & Pengembalian Buku
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <button onclick="cetakLaporanSemua()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow-sm">
+                                    <i class="fa-solid fa-print"></i> Cetak Semua Laporan
+                                </button>
+                                <button onclick="clearLaporan()" class="text-xs text-red-500 hover:text-red-700 font-medium ml-2">Hapus Semua</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600">
+                                        <th class="p-2 border-b">Tgl Pinjam</th>
+                                        <th class="p-2 border-b">NIS & Nama Siswa</th>
+                                        <th class="p-2 border-b">Judul Buku</th>
+                                        <th class="p-2 border-b">Batas / Tgl Kembali</th>
+                                        <th class="p-2 border-b">Status & Denda</th>
+                                        <th class="p-2 border-b text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelLaporan">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t text-right">
+                        <span class="text-xs text-slate-500">Total Transaksi: <strong id="totalTransaksi">0</strong> Peminjaman</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATISTIK & SEARCH BAR -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-slate-100 grid md:grid-cols-3 gap-6 items-center">
+            <div class="md:col-span-2 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="filterBuku()" placeholder="Cari judul buku, penulis, atau kategori..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-white/80">
+            </div>
+            <div class="flex justify-around bg-emerald-50/80 rounded-xl p-3 border border-emerald-100">
+                <div class="text-center">
+                    <span class="text-xs text-slate-500 font-medium">Total Judul</span>
+                    <p id="statTotalJudul" class="text-lg font-bold text-emerald-700">0 Judul</p>
+                </div>
+                <div class="text-center border-l border-emerald-200 pl-4">
+                    <span class="text-xs text-slate-500 font-medium">Total Eksemplar</span>
+                    <p id="statTotalStok" class="text-lg font-bold text-emerald-700">0 Buku</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KATALOG BUKU -->
+    <section class="py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-emerald-600"></i> Koleksi Buku Perpustakaan
+            </h2>
+            <div id="bukuGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </div>
+    </section>
+
+    <!-- MODAL LOGIN ADMIN -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white/95 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative border border-emerald-100">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl shadow-inner">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Login Admin Pustaka</h3>
+                <p class="text-xs text-slate-500">Masuk untuk mengelola koleksi & laporan</p>
+            </div>
+            <form onsubmit="submitLogin(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Username</label>
+                    <input type="text" id="loginUsername" required autocomplete="off" class="w-full mt-1 p-2.5 border rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Password</label>
+                    <input type="password" id="loginPassword" required autocomplete="off" class="w-full mt-1 p-2.5 border rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 shadow-md shadow-emerald-200">Masuk</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PEMINJAMAN BUKU -->
+    <div id="pinjamModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white/95 rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-emerald-100">
+            <button onclick="closePinjamModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-800 border-b pb-3">Form Peminjaman Buku</h3>
+            <form id="formPinjam" onsubmit="submitPeminjaman(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="modalBukuId">
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Judul Buku</label>
+                    <input type="text" id="modalJudulBuku" readonly class="w-full mt-1 p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-emerald-800">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 block mb-1">Kartu Pelajar (Scan Barcode / QR)</label>
+                    <div id="reader" class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50 hidden"></div>
+                    <button type="button" id="btnScan" onclick="startScanner()" class="w-full mt-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-barcode"></i> Buka Kamera Scan Barcode
+                    </button>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Nomor Induk Siswa (NIS)</label>
+                    <input type="text" id="nisInput" required placeholder="Contoh: 202610012" class="w-full mt-1 p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Nama Lengkap Siswa</label>
+                    <input type="text" id="namaSiswaInput" required placeholder="Masukkan Nama Siswa" class="w-full mt-1 p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Lama Peminjaman (3 - 7 Hari)</label>
+                    <select id="lamaPinjamInput" class="w-full mt-1 p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                        <option value="3">3 Hari</option>
+                        <option value="4">4 Hari</option>
+                        <option value="5">5 Hari</option>
+                        <option value="6">6 Hari</option>
+                        <option value="7" selected>7 Hari (Maksimal)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-sm transition mt-2 shadow-md shadow-emerald-200">Konfirmasi Peminjaman</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT LAPORAN (ADMIN) -->
+    <div id="editLaporanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white/95 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeEditLaporanModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-800 border-b pb-3">Edit Status & Tanggal Pengembalian</h3>
+            <form onsubmit="submitEditLaporan(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="editLaporanId">
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Nama Siswa / NIS</label>
+                    <input type="text" id="editNamaSiswa" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-xl text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Judul Buku</label>
+                    <input type="text" id="editJudulBuku" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-xl text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Status Pengembalian</label>
+                    <select id="editStatusSelect" class="w-full mt-1 p-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                        <option value="Dipinjam">Masih Dipinjam</option>
+                        <option value="Dikembalikan">Sudah Dikembalikan</option>
+                        <option value="Hilang">Buku Hilang (Ganti Rugi)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600">Tanggal Siswa Mengembalikan</label>
+                    <input type="date" id="editTglKembaliInput" class="w-full mt-1 p-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                    <p class="text-[10px] text-slate-500 mt-1">*Jika diset "Sudah Dikembalikan", tanggal ini digunakan untuk hitung keterlambatan/denda.</p>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TEMPLATE CETAK STRUK & LAPORAN BUKTI (AREA CETAK) -->
+    <div id="printArea" class="hidden p-8 bg-white text-black font-sans">
+        <!-- KOP LAPORAN DENGAN LOGO MADRASAH -->
+        <div class="flex items-center justify-between border-b-4 border-double border-slate-800 pb-4 mb-4">
+            <div class="w-20 h-20 flex-shrink-0 flex items-center justify-center">
+                <img id="printLogoImg" src="gambar/logo.png" alt="Logo MI" class="max-h-full max-w-full object-contain" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2991/2991361.png';">
+            </div>
+            <div class="text-center flex-1 px-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
+                <h2 class="text-lg font-extrabold uppercase">MI AL-KAHFI PURBASANA</h2>
+                <p class="text-xs font-medium">Kecamatan Tarub, Kabupaten Tegal - Jawa Tengah</p>
+                <p class="text-[10px] text-slate-600">Jl. Raya Purbasana, Tarub, Tegal 52184 | Email: info@mialkahfi.sch.id</p>
+            </div>
+            <div class="w-20 h-20 invisible"></div>
+        </div>
+
+        <div class="text-center mb-6">
+            <h4 id="printTitle" class="text-base font-bold uppercase underline">BUKTI PEMINJAMAN / PENGEMBALIAN BUKU</h4>
+        </div>
+
+        <div id="printContent" class="text-sm space-y-2"></div>
+
+        <div class="mt-12 flex justify-between items-center text-xs pt-4">
+            <div class="text-center">
+                <p id="printTtdPeminjamLabel">Siswa Peminjam,</p>
+                <br><br><br>
+                <p id="printNamaSiswa" class="font-bold underline"></p>
+            </div>
+            <div class="text-center">
+                <p>Purbasana, <span id="printTanggalCetak"></span></p>
+                <p>Petugas Perpustakaan,</p>
+                <br><br><br>
+                <p class="font-bold underline">Admin Pustaka</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900/90 backdrop-blur-md text-slate-400 py-6 text-center text-xs border-t border-slate-800 relative z-10">
+        &copy; 2026 MI Al Kahfi Purbasana - Perpustakaan Digital
+    </footer>
+
+    <!-- SCRIPT ANIMASI BACKGROUND 3D (THREE.JS) -->
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const islamicGroup = new THREE.Group();
+        scene.add(islamicGroup);
+
+        const materials = [
+            new THREE.MeshStandardMaterial({ color: 0x059669, wireframe: true, transparent: true, opacity: 0.35 }),
+            new THREE.MeshStandardMaterial({ color: 0xd97706, wireframe: true, transparent: true, opacity: 0.25 }),
+            new THREE.MeshStandardMaterial({ color: 0x0d9488, wireframe: true, transparent: true, opacity: 0.30 })
+        ];
+
+        const shapes = [];
+
+        for (let i = 0; i < 45; i++) {
+            let geometry;
+            const randType = Math.random();
+            
+            if (randType < 0.4) {
+                geometry = new THREE.OctahedronGeometry(Math.random() * 1.5 + 0.5, 0);
+            } else if (randType < 0.7) {
+                geometry = new THREE.IcosahedronGeometry(Math.random() * 1.2 + 0.4, 0);
+            } else {
+                geometry = new THREE.TorusGeometry(Math.random() * 1 + 0.3, 0.15, 8, 16);
+            }
+
+            const mat = materials[Math.floor(Math.random() * materials.length)];
+            const mesh = new THREE.Mesh(geometry, mat);
+
+            mesh.position.x = (Math.random() - 0.5) * 35;
+            mesh.position.y = (Math.random() - 0.5) * 35;
+            mesh.position.z = (Math.random() - 0.5) * 25 - 5;
+
+            mesh.rotation.x = Math.random() * Math.PI;
+            mesh.rotation.y = Math.random() * Math.PI;
+
+            mesh.userData = {
+                rotSpeedX: (Math.random() - 0.5) * 0.01,
+                rotSpeedY: (Math.random() - 0.5) * 0.01,
+                floatSpeed: Math.random() * 0.005 + 0.002
+            };
+
+            shapes.push(mesh);
+            islamicGroup.add(mesh);
+        }
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x059669, 1.5, 50);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        camera.position.z = 15;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            shapes.forEach(shape => {
+                shape.rotation.x += shape.userData.rotSpeedX;
+                shape.rotation.y += shape.userData.rotSpeedY;
+                shape.position.y += Math.sin(Date.now() * 0.001 + shape.position.x) * 0.003;
+            });
+
+            islamicGroup.rotation.y += (mouseX - islamicGroup.rotation.y) * 0.05;
+            islamicGroup.rotation.x += (-mouseY - islamicGroup.rotation.x) * 0.05;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+
+    <!-- JAVASCRIPT LOGIC APLIKASI PERPUSTAKAAN -->
+    <script>
+        const initialBuku = [
+            { id: 1, judul: "Kisah 25 Nabi dan Rasul", penulis: "Ahmad Zaenuri", kategori: "Agama", stokTotal: 10, stokAda: 8, harga: 45000, gambar: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=400&auto=format&fit=crop" },
+            { id: 2, judul: "Matematika Ceria Kelas 4", penulis: "Tim Kurikulum MI", kategori: "Pelajaran", stokTotal: 15, stokAda: 12, harga: 35000, gambar: "https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=400&auto=format&fit=crop" },
+            { id: 3, judul: "Ensiklopedia Sains Anak", penulis: "Dr. Budi Santoso", kategori: "Pengetahuan", stokTotal: 5, stokAda: 2, harga: 75000, gambar: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop" },
+            { id: 4, judul: "Belajar Tajwid Praktis", penulis: "Ust. Hasan Basri", kategori: "Agama", stokTotal: 8, stokAda: 0, harga: 30000, gambar: "https://images.unsplash.com/photo-1585779034823-7e9df84247f5?q=80&w=400&auto=format&fit=crop" }
+        ];
+
+        let dataBuku = JSON.parse(localStorage.getItem('mi_buku')) || initialBuku;
+        let dataLaporan = JSON.parse(localStorage.getItem('mi_laporan')) || [];
+        let logoMadrasah = localStorage.getItem('mi_logo_madrasah') || 'gambar/logo.png';
+        let isAdminLoggedIn = sessionStorage.getItem('mi_admin_login') === 'true';
+        let html5QrcodeScanner = null;
+
+        const ADMIN_USERNAME = 'pustaka';
+        const ADMIN_PASSWORD = 'Pustaka2026';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLogoMadrasah();
+            renderKatalog();
+            renderLaporan();
+            updateAdminStateUI();
+        });
+
+        // FUNGSI KELOLA LOGO MADRASAH
+        function loadLogoMadrasah() {
+            const navLogoImg = document.getElementById('navbarLogoImg');
+            const printLogoImg = document.getElementById('printLogoImg');
+            
+            if (logoMadrasah) {
+                if (navLogoImg) navLogoImg.src = logoMadrasah;
+                if (printLogoImg) printLogoImg.src = logoMadrasah;
+            }
+        }
+
+        function gantiLogoMadrasah(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoMadrasah = event.target.result;
+                    localStorage.setItem('mi_logo_madrasah', logoMadrasah);
+                    loadLogoMadrasah();
+                    alert("Logo Madrasah berhasil diperbarui!");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderKatalog(bukuList = dataBuku) {
+            const grid = document.getElementById('bukuGrid');
+            grid.innerHTML = '';
+
+            let totalJudul = bukuList.length;
+            let totalStok = 0;
+
+            bukuList.forEach(b => {
+                totalStok += parseInt(b.stokAda || 0);
+                const isTersedia = b.stokAda > 0;
+                
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 rounded-xl overflow-hidden mb-3 bg-slate-100">
+                                <img src="${b.gambar}" alt="${b.judul}" class="w-full h-full object-cover">
+                                <span class="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${b.kategori}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${b.judul}</h3>
+                            <p class="text-xs text-slate-500 mb-2">Penulis: ${b.penulis}</p>
+                            <div class="flex justify-between items-center text-xs mb-3">
+                                <span class="text-slate-600">Stok: <strong>${b.stokAda}/${b.stokTotal}</strong></span>
+                                <span class="text-emerald-700 font-bold">Rp ${parseInt(b.harga || 0).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <button onclick="openPinjamModal(${b.id})" ${!isTersedia ? 'disabled' : ''} class="w-full ${isTersedia ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} font-semibold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
+                            <i class="fa-solid ${isTersedia ? 'fa-book-bookmark' : 'fa-ban'}"></i> ${isTersedia ? 'Pinjam Buku' : 'Stok Habis'}
+                        </button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('statTotalJudul').innerText = `${totalJudul} Judul`;
+            document.getElementById('statTotalStok').innerText = `${totalStok} Buku`;
+        }
+
+        // FUNGSI LAPORAN PEMINJAMAN
+        function renderLaporan() {
+            const tbody = document.getElementById('tabelLaporan');
+            tbody.innerHTML = '';
+
+            document.getElementById('totalTransaksi').innerText = dataLaporan.length;
+
+            if (dataLaporan.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data peminjaman buku.</td></tr>`;
+                return;
+            }
+
+            dataLaporan.forEach((item, index) => {
+                let statusBadge = '';
+                let infoKembali = item.tglBatas;
+
+                if (item.status === 'Dipinjam') {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Dipinjam</span>`;
+                } else if (item.status === 'Dikembalikan') {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Selesai</span>`;
+                    infoKembali = `${item.tglBatas} <br><span class="text-[10px] text-emerald-600">Dikembalikan: ${item.tglKembaliActual || '-'}</span>`;
+                } else {
+                    statusBadge = `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Hilang</span>`;
+                }
+
+                let dendaText = item.denda > 0 ? `<div class="text-red-600 font-bold text-[10px]">Denda: Rp ${item.denda.toLocaleString('id-ID')}</div>` : '';
+
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-2">${item.tglPinjam}</td>
+                        <td class="p-2 font-semibold text-slate-700">${item.nis}<br><span class="text-slate-500 font-normal">${item.namaSiswa}</span></td>
+                        <td class="p-2">${item.judulBuku}</td>
+                        <td class="p-2">${infoKembali}</td>
+                        <td class="p-2">${statusBadge} ${dendaText}</td>
+                        <td class="p-2 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="cetakStrukSatuan(${index})" title="Cetak Bukti Transaksi" class="bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-lg text-xs transition">
+                                    <i class="fa-solid fa-print"></i>
+                                </button>
+                                <button onclick="openEditLaporanModal(${index})" title="Edit Status" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 rounded-lg text-xs transition">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="hapusLaporan(${index})" title="Hapus Laporan" class="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-lg text-xs transition">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // FUNGSI MODAL PEMINJAMAN
+        function openPinjamModal(bukuId) {
+            const buku = dataBuku.find(b => b.id === bukuId);
+            if (!buku) return;
+
+            document.getElementById('modalBukuId').value = buku.id;
+            document.getElementById('modalJudulBuku').value = buku.judul;
+            document.getElementById('pinjamModal').classList.remove('hidden');
+        }
+
+        function closePinjamModal() {
+            document.getElementById('pinjamModal').classList.add('hidden');
+            document.getElementById('formPinjam').reset();
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+                document.getElementById('reader').classList.add('hidden');
+            }
+        }
+
+        function startScanner() {
+            document.getElementById('reader').classList.remove('hidden');
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((decodedText) => {
+                document.getElementById('nisInput').value = decodedText;
+                html5QrcodeScanner.clear();
+                document.getElementById('reader').classList.add('hidden');
+            });
+        }
+
+        function submitPeminjaman(e) {
+            e.preventDefault();
+            const bukuId = parseInt(document.getElementById('modalBukuId').value);
+            const nis = document.getElementById('nisInput').value.trim();
+            const namaSiswa = document.getElementById('namaSiswaInput').value.trim();
+            const lamaPinjam = parseInt(document.getElementById('lamaPinjamInput').value);
+
+            const buku = dataBuku.find(b => b.id === bukuId);
+            if (!buku || buku.stokAda <= 0) {
+                alert("Stok buku tidak tersedia!");
+                return;
+            }
+
+            // Kurangi Stok Buku
+            buku.stokAda -= 1;
+            localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+
+            const today = new Date();
+            const tglBatas = new Date();
+            tglBatas.setDate(today.getDate() + lamaPinjam);
+
+            const formatTgl = (d) => d.toISOString().split('T')[0];
+
+            const transaksiBaru = {
+                id: Date.now(),
+                bukuId: buku.id,
+                judulBuku: buku.judul,
+                hargaBuku: buku.harga,
+                nis: nis,
+                namaSiswa: namaSiswa,
+                tglPinjam: formatTgl(today),
+                tglBatas: formatTgl(tglBatas),
+                tglKembaliActual: '',
+                status: 'Dipinjam',
+                denda: 0
+            };
+
+            dataLaporan.unshift(transaksiBaru);
+            localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+
+            renderKatalog();
+            renderLaporan();
+            closePinjamModal();
+
+            // Tampilkan Pilihan Cetak Bukti Peminjaman
+            if (confirm("Peminjaman berhasil dicatat! Apakah Anda ingin mencetak bukti peminjaman untuk siswa?")) {
+                cetakStrukSatuan(0);
+            }
+        }
+
+        // EDIT LAPORAN & STATUS PENGEMBALIAN
+        function openEditLaporanModal(index) {
+            const item = dataLaporan[index];
+            if (!item) return;
+
+            document.getElementById('editLaporanId').value = index;
+            document.getElementById('editNamaSiswa').value = `${item.namaSiswa} (${item.nis})`;
+            document.getElementById('editJudulBuku').value = item.judulBuku;
+            document.getElementById('editStatusSelect').value = item.status;
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('editTglKembaliInput').value = item.tglKembaliActual || todayStr;
+
+            document.getElementById('editLaporanModal').classList.remove('hidden');
+        }
+
+        function closeEditLaporanModal() {
+            document.getElementById('editLaporanModal').classList.add('hidden');
+        }
+
+        function submitEditLaporan(e) {
+            e.preventDefault();
+            const index = document.getElementById('editLaporanId').value;
+            const item = dataLaporan[index];
+            if (!item) return;
+
+            const statusLama = item.status;
+            const statusBaru = document.getElementById('editStatusSelect').value;
+            const tglKembaliAct = document.getElementById('editTglKembaliInput').value;
+
+            item.status = statusBaru;
+            item.tglKembaliActual = tglKembaliAct;
+
+            // Kembalikan stok buku jika status berubah menjadi Dikembalikan
+            if (statusLama === 'Dipinjam' && (statusBaru === 'Dikembalikan' || statusBaru === 'Hilang')) {
+                const buku = dataBuku.find(b => b.id === item.bukuId);
+                if (buku && statusBaru === 'Dikembalikan') {
+                    buku.stokAda = Math.min(buku.stokTotal, buku.stokAda + 1);
+                }
+            }
+
+            // Hitung Denda Keterlambatan (Rp 1.000 / Hari)
+            if (statusBaru === 'Dikembalikan' && tglKembaliAct) {
+                const tglBatas = new Date(item.tglBatas);
+                const tglKembali = new Date(tglKembaliAct);
+                const diffTime = tglKembali - tglBatas;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 0) {
+                    item.denda = diffDays * 1000;
+                } else {
+                    item.denda = 0;
+                }
+            } else if (statusBaru === 'Hilang') {
+                item.denda = item.hargaBuku || 50000; // Denda ganti rugi sebesar harga buku
+            } else {
+                item.denda = 0;
+            }
+
+            localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+            localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+
+            renderKatalog();
+            renderLaporan();
+            closeEditLaporanModal();
+
+            if (confirm("Data pengembalian berhasil diperbarui! Cetak bukti pengembalian?")) {
+                cetakStrukSatuan(index);
+            }
+        }
+
+        // FUNGSI HAPUS LAPORAN INDIVIDUAL
+        function hapusLaporan(index) {
+            const item = dataLaporan[index];
+            if (!item) return;
+
+            if (confirm(`Apakah Anda yakin ingin menghapus laporan peminjaman siswa ${item.namaSiswa}?`)) {
+                // Restore stok buku jika masih dipinjam saat dihapus
+                if (item.status === 'Dipinjam') {
+                    const buku = dataBuku.find(b => b.id === item.bukuId);
+                    if (buku) {
+                        buku.stokAda = Math.min(buku.stokTotal, buku.stokAda + 1);
+                        localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+                    }
+                }
+
+                dataLaporan.splice(index, 1);
+                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+                renderKatalog();
+                renderLaporan();
+            }
+        }
+
+        function clearLaporan() {
+            if (confirm("Apakah Anda yakin ingin menghapus SELURUH riwayat laporan peminjaman?")) {
+                dataLaporan = [];
+                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+                renderLaporan();
+            }
+        }
+
+        // FUNGSI CETAK BUKTI PER TRANSAKSI SISWA (KOP SURAT + KETERANGAN PENGEMBALIAN)
+        function cetakStrukSatuan(index) {
+            const item = dataLaporan[index];
+            if (!item) return;
+
+            loadLogoMadrasah();
+
+            document.getElementById('printTitle').innerText = "BUKTI PEMINJAMAN & PENGEMBALIAN BUKU";
+            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('printNamaSiswa').innerText = item.namaSiswa;
+            document.getElementById('printTtdPeminjamLabel').innerText = "Siswa Peminjam,";
+
+            let htmlContent = `
+                <table class="w-full border-collapse my-4 text-xs">
+                    <tr><td class="py-1 w-36 font-semibold">Nomor Transaksi</td><td>: TRX-${item.id}</td></tr>
+                    <tr><td class="py-1 font-semibold">NIS Siswa</td><td>: ${item.nis}</td></tr>
+                    <tr><td class="py-1 font-semibold">Nama Siswa</td><td>: ${item.namaSiswa}</td></tr>
+                    <tr><td class="py-1 font-semibold">Judul Buku</td><td>: <strong>${item.judulBuku}</strong></td></tr>
+                    <tr><td class="py-1 font-semibold">Tanggal Pinjam</td><td>: ${item.tglPinjam}</td></tr>
+                    <tr><td class="py-1 font-semibold">Batas Pengembalian</td><td>: ${item.tglBatas}</td></tr>
+                    <tr><td class="py-1 font-semibold">Status Saat Ini</td><td>: <strong>${item.status.toUpperCase()}</strong></td></tr>
+            `;
+
+            if (item.status === 'Dikembalikan') {
+                htmlContent += `
+                    <tr><td class="py-1 font-semibold">Tanggal Dikembalikan</td><td>: ${item.tglKembaliActual || '-'}</td></tr>
+                    <tr><td class="py-1 font-semibold">Denda Keterlambatan</td><td>: Rp ${(item.denda || 0).toLocaleString('id-ID')}</td></tr>
+                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku telah dikembalikan dalam kondisi baik.</td></tr>
+                `;
+            } else if (item.status === 'Hilang') {
+                htmlContent += `
+                    <tr><td class="py-1 font-semibold">Biaya Ganti Rugi</td><td>: Rp ${(item.denda || 0).toLocaleString('id-ID')}</td></tr>
+                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku dilaporkan hilang dan dalam proses penggantian/ganti rugi.</td></tr>
+                `;
+            } else {
+                htmlContent += `
+                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku dalam masa peminjaman aktif. Harap dikembalikan sebelum tanggal batas.</td></tr>
+                `;
+            }
+
+            htmlContent += `</table>`;
+
+            document.getElementById('printContent').innerHTML = htmlContent;
+            window.print();
+        }
+
+        // FUNGSI CETAK SEMUA LAPORAN TABEL
+        function cetakLaporanSemua() {
+            if (dataLaporan.length === 0) {
+                alert("Tidak ada data laporan untuk dicetak!");
+                return;
+            }
+
+            loadLogoMadrasah();
+
+            document.getElementById('printTitle').innerText = "LAPORAN REKAPITULASI PEMINJAMAN BUKU";
+            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('printNamaSiswa').innerText = "Kepala Perpustakaan";
+            document.getElementById('printTtdPeminjamLabel').innerText = "Mengetahui,";
+
+            let tableRows = dataLaporan.map((item, idx) => `
+                <tr class="border-b text-xs">
+                    <td class="p-1.5 border text-center">${idx + 1}</td>
+                    <td class="p-1.5 border">${item.tglPinjam}</td>
+                    <td class="p-1.5 border">${item.nis} - ${item.namaSiswa}</td>
+                    <td class="p-1.5 border">${item.judulBuku}</td>
+                    <td class="p-1.5 border">${item.tglBatas}</td>
+                    <td class="p-1.5 border">${item.status} ${item.tglKembaliActual ? '(' + item.tglKembaliActual + ')' : ''}</td>
+                    <td class="p-1.5 border text-right">Rp ${(item.denda || 0).toLocaleString('id-ID')}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('printContent').innerHTML = `
+                <table class="w-full border-collapse border my-4 text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 font-bold">
+                            <th class="p-1.5 border">No</th>
+                            <th class="p-1.5 border">Tgl Pinjam</th>
+                            <th class="p-1.5 border">NIS & Nama Siswa</th>
+                            <th class="p-1.5 border">Judul Buku</th>
+                            <th class="p-1.5 border">Batas Kembalian</th>
+                            <th class="p-1.5 border">Status & Tgl Kembali</th>
+                            <th class="p-1.5 border">Denda</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+
+            window.print();
+        }
+
+        // AKSI SEARCH & FILTER
+        function filterBuku() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = dataBuku.filter(b => 
+                b.judul.toLowerCase().includes(query) ||
+                b.penulis.toLowerCase().includes(query) ||
+                b.kategori.toLowerCase().includes(query)
+            );
+            renderKatalog(filtered);
+        }
+
+        // LOGIN & ADMIN AUTHENTICATION
+        function handleAuthClick() {
+            if (isAdminLoggedIn) {
+                if (confirm("Apakah Anda yakin ingin logout dari Mode Admin?")) {
+                    isAdminLoggedIn = false;
+                    sessionStorage.removeItem('mi_admin_login');
+                    updateAdminStateUI();
+                }
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function submitLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('loginUsername').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            if (user === ADMIN_USERNAME && pass === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('mi_admin_login', 'true');
+                updateAdminStateUI();
+                closeLoginModal();
+                alert("Login Admin Berhasil!");
+            } else {
+                alert("Username atau Password Admin salah!");
+            }
+        }
+
+        function updateAdminStateUI() {
+            const adminPanel = document.getElementById('adminPanel');
+            const authBtnText = document.getElementById('authBtnText');
+
+            if (isAdminLoggedIn) {
+                adminPanel.classList.remove('hidden');
+                authBtnText.innerText = "Logout Admin";
+            } else {
+                adminPanel.classList.add('hidden');
+                authBtnText.innerText = "Login Admin";
+            }
+        }
+
+        function tambahBuku(e) {
+            e.preventDefault();
+            const judul = document.getElementById('addJudul').value.trim();
+            const penulis = document.getElementById('addPenulis').value.trim();
+            const kategori = document.getElementById('addKategori').value;
+            const stok = parseInt(document.getElementById('addStok').value);
+            const harga = parseInt(document.getElementById('addHarga').value);
+            const fileGambar = document.getElementById('addGambar').files[0];
+
+            let defaultImg = "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=400&auto=format&fit=crop";
+
+            const saveBukuObj = (imgUrl) => {
+                const bukuBaru = {
+                    id: Date.now(),
+                    judul: judul,
+                    penulis: penulis,
+                    kategori: kategori,
+                    stokTotal: stok,
+                    stokAda: stok,
+                    harga: harga,
+                    gambar: imgUrl
+                };
+                dataBuku.unshift(bukuBaru);
+                localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+                renderKatalog();
+                e.target.reset();
+                alert("Buku baru berhasil ditambahkan!");
+            };
+
+            if (fileGambar) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    saveBukuObj(event.target.result);
+                };
+                reader.readAsDataURL(fileGambar);
+            } else {
+                saveBukuObj(defaultImg);
+            }
+        }
+    </script>
+</body>
+</html>
