@@ -529,6 +529,7 @@
             }
         }
 
+        // FUNGSI UTAMA RENDER KATALOG BUKU
         function renderKatalog(bukuList = dataBuku) {
             const grid = document.getElementById('bukuGrid');
             grid.innerHTML = '';
@@ -540,372 +541,120 @@
                 totalStok += parseInt(b.stokAda || 0);
                 const isTersedia = b.stokAda > 0;
                 
-                grid.innerHTML += `
-                    <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between">
+                // Tambahan tombol Hapus khusus jika Admin sedang Logged In
+                const deleteBtnHtml = isAdminLoggedIn ? `
+                    <button onclick="hapusBuku(${b.id})" class="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs transition shadow-md z-20" title="Hapus Buku Ini">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                ` : '';
+
+                const cardHtml = `
+                    <div class="bg-white/90 backdrop-blur-md rounded-2xl overflow-hidden shadow-md border border-slate-100 flex flex-col justify-between hover:shadow-xl transition duration-300 relative group">
+                        ${deleteBtnHtml}
                         <div>
-                            <div class="relative h-48 rounded-xl overflow-hidden mb-3 bg-slate-100">
-                                <img src="${b.gambar}" alt="${b.judul}" class="w-full h-full object-cover">
-                                <span class="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${b.kategori}</span>
+                            <div class="h-48 overflow-hidden relative">
+                                <img src="${b.gambar}" alt="${b.judul}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                <span class="absolute bottom-2 left-2 bg-emerald-800/80 text-white text-[10px] px-2 py-0.5 rounded-md font-semibold backdrop-blur-sm">
+                                    ${b.kategori}
+                                </span>
                             </div>
-                            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${b.judul}</h3>
-                            <p class="text-xs text-slate-500 mb-2">Penulis: ${b.penulis}</p>
-                            <div class="flex justify-between items-center text-xs mb-3">
-                                <span class="text-slate-600">Stok: <strong>${b.stokAda}/${b.stokTotal}</strong></span>
-                                <span class="text-emerald-700 font-bold">Rp ${parseInt(b.harga || 0).toLocaleString('id-ID')}</span>
+                            <div class="p-4 space-y-2">
+                                <h3 class="font-bold text-slate-800 text-sm line-clamp-2">${b.judul}</h3>
+                                <p class="text-xs text-slate-500"><i class="fa-solid fa-pen-nib text-emerald-600 mr-1"></i>${b.penulis}</p>
+                                <div class="flex justify-between items-center text-xs pt-1 border-t border-slate-100">
+                                    <span class="text-slate-500 font-medium">Stok Tersedia:</span>
+                                    <span class="font-bold ${isTersedia ? 'text-emerald-600' : 'text-red-500'}">
+                                        ${b.stokAda} / ${b.stokTotal}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="openPinjamModal(${b.id})" ${!isTersedia ? 'disabled' : ''} class="w-full ${isTersedia ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} font-semibold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
-                            <i class="fa-solid ${isTersedia ? 'fa-book-bookmark' : 'fa-ban'}"></i> ${isTersedia ? 'Pinjam Buku' : 'Stok Habis'}
-                        </button>
+                        <div class="p-4 pt-0">
+                            <button onclick="bukaModalPinjam(${b.id})" ${!isTersedia ? 'disabled' : ''} class="w-full py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 ${isTersedia ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+                                <i class="fa-solid fa-hand-holding-hand"></i> ${isTersedia ? 'Pinjam Buku Ini' : 'Stok Habis'}
+                            </button>
+                        </div>
                     </div>
                 `;
+                grid.innerHTML += cardHtml;
             });
 
             document.getElementById('statTotalJudul').innerText = `${totalJudul} Judul`;
             document.getElementById('statTotalStok').innerText = `${totalStok} Buku`;
         }
 
-        // FUNGSI LAPORAN PEMINJAMAN
-        function renderLaporan() {
-            const tbody = document.getElementById('tabelLaporan');
-            tbody.innerHTML = '';
+        // FUNGSI FITUR BARU: HAPUS BUKU INDIVIDUAL
+        function hapusBuku(id) {
+            const bukuTarget = dataBuku.find(b => b.id === id);
+            if (!bukuTarget) return;
 
-            document.getElementById('totalTransaksi').innerText = dataLaporan.length;
-
-            if (dataLaporan.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data peminjaman buku.</td></tr>`;
-                return;
-            }
-
-            dataLaporan.forEach((item, index) => {
-                let statusBadge = '';
-                let infoKembali = item.tglBatas;
-
-                if (item.status === 'Dipinjam') {
-                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Dipinjam</span>`;
-                } else if (item.status === 'Dikembalikan') {
-                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Selesai</span>`;
-                    infoKembali = `${item.tglBatas} <br><span class="text-[10px] text-emerald-600">Dikembalikan: ${item.tglKembaliActual || '-'}</span>`;
-                } else {
-                    statusBadge = `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Hilang</span>`;
-                }
-
-                let dendaText = item.denda > 0 ? `<div class="text-red-600 font-bold text-[10px]">Denda: Rp ${item.denda.toLocaleString('id-ID')}</div>` : '';
-
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-slate-50">
-                        <td class="p-2">${item.tglPinjam}</td>
-                        <td class="p-2 font-semibold text-slate-700">${item.nis}<br><span class="text-slate-500 font-normal">${item.namaSiswa}</span></td>
-                        <td class="p-2">${item.judulBuku}</td>
-                        <td class="p-2">${infoKembali}</td>
-                        <td class="p-2">${statusBadge} ${dendaText}</td>
-                        <td class="p-2 text-center">
-                            <div class="flex items-center justify-center gap-1">
-                                <button onclick="cetakStrukSatuan(${index})" title="Cetak Bukti Transaksi" class="bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded-lg text-xs transition">
-                                    <i class="fa-solid fa-print"></i>
-                                </button>
-                                <button onclick="openEditLaporanModal(${index})" title="Edit Status" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 rounded-lg text-xs transition">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </button>
-                                <button onclick="hapusLaporan(${index})" title="Hapus Laporan" class="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-lg text-xs transition">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        // FUNGSI MODAL PEMINJAMAN
-        function openPinjamModal(bukuId) {
-            const buku = dataBuku.find(b => b.id === bukuId);
-            if (!buku) return;
-
-            document.getElementById('modalBukuId').value = buku.id;
-            document.getElementById('modalJudulBuku').value = buku.judul;
-            document.getElementById('pinjamModal').classList.remove('hidden');
-        }
-
-        function closePinjamModal() {
-            document.getElementById('pinjamModal').classList.add('hidden');
-            document.getElementById('formPinjam').reset();
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear();
-                document.getElementById('reader').classList.add('hidden');
+            if (confirm(`Apakah Anda yakin ingin menghapus buku "${bukuTarget.judul}" dari koleksi?`)) {
+                dataBuku = dataBuku.filter(b => b.id !== id);
+                localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+                renderKatalog();
+                alert("Buku berhasil dihapus dari koleksi!");
             }
         }
 
-        function startScanner() {
-            document.getElementById('reader').classList.remove('hidden');
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            html5QrcodeScanner.render((decodedText) => {
-                document.getElementById('nisInput').value = decodedText;
-                html5QrcodeScanner.clear();
-                document.getElementById('reader').classList.add('hidden');
-            });
-        }
-
-        function submitPeminjaman(e) {
+        // FUNGSI TAMBAH BUKU BARU
+        function tambahBuku(e) {
             e.preventDefault();
-            const bukuId = parseInt(document.getElementById('modalBukuId').value);
-            const nis = document.getElementById('nisInput').value.trim();
-            const namaSiswa = document.getElementById('namaSiswaInput').value.trim();
-            const lamaPinjam = parseInt(document.getElementById('lamaPinjamInput').value);
+            const judul = document.getElementById('addJudul').value;
+            const penulis = document.getElementById('addPenulis').value;
+            const kategori = document.getElementById('addKategori').value;
+            const stok = parseInt(document.getElementById('addStok').value);
+            const harga = parseInt(document.getElementById('addHarga').value);
+            const gambarInput = document.getElementById('addGambar');
 
-            const buku = dataBuku.find(b => b.id === bukuId);
-            if (!buku || buku.stokAda <= 0) {
-                alert("Stok buku tidak tersedia!");
-                return;
-            }
+            const newId = Date.now();
 
-            // Kurangi Stok Buku
-            buku.stokAda -= 1;
-            localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+            const simpanData = (gambarUrl) => {
+                const bukuBaru = {
+                    id: newId,
+                    judul: judul,
+                    penulis: penulis,
+                    kategori: kategori,
+                    stokTotal: stok,
+                    stokAda: stok,
+                    harga: harga,
+                    gambar: gambarUrl || "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=400&auto=format&fit=crop"
+                };
 
-            const today = new Date();
-            const tglBatas = new Date();
-            tglBatas.setDate(today.getDate() + lamaPinjam);
-
-            const formatTgl = (d) => d.toISOString().split('T')[0];
-
-            const transaksiBaru = {
-                id: Date.now(),
-                bukuId: buku.id,
-                judulBuku: buku.judul,
-                hargaBuku: buku.harga,
-                nis: nis,
-                namaSiswa: namaSiswa,
-                tglPinjam: formatTgl(today),
-                tglBatas: formatTgl(tglBatas),
-                tglKembaliActual: '',
-                status: 'Dipinjam',
-                denda: 0
+                dataBuku.unshift(bukuBaru);
+                localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+                renderKatalog();
+                e.target.reset();
+                alert("Buku baru berhasil ditambahkan!");
             };
 
-            dataLaporan.unshift(transaksiBaru);
-            localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
-
-            renderKatalog();
-            renderLaporan();
-            closePinjamModal();
-
-            // Tampilkan Pilihan Cetak Bukti Peminjaman
-            if (confirm("Peminjaman berhasil dicatat! Apakah Anda ingin mencetak bukti peminjaman untuk siswa?")) {
-                cetakStrukSatuan(0);
-            }
-        }
-
-        // EDIT LAPORAN & STATUS PENGEMBALIAN
-        function openEditLaporanModal(index) {
-            const item = dataLaporan[index];
-            if (!item) return;
-
-            document.getElementById('editLaporanId').value = index;
-            document.getElementById('editNamaSiswa').value = `${item.namaSiswa} (${item.nis})`;
-            document.getElementById('editJudulBuku').value = item.judulBuku;
-            document.getElementById('editStatusSelect').value = item.status;
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('editTglKembaliInput').value = item.tglKembaliActual || todayStr;
-
-            document.getElementById('editLaporanModal').classList.remove('hidden');
-        }
-
-        function closeEditLaporanModal() {
-            document.getElementById('editLaporanModal').classList.add('hidden');
-        }
-
-        function submitEditLaporan(e) {
-            e.preventDefault();
-            const index = document.getElementById('editLaporanId').value;
-            const item = dataLaporan[index];
-            if (!item) return;
-
-            const statusLama = item.status;
-            const statusBaru = document.getElementById('editStatusSelect').value;
-            const tglKembaliAct = document.getElementById('editTglKembaliInput').value;
-
-            item.status = statusBaru;
-            item.tglKembaliActual = tglKembaliAct;
-
-            // Kembalikan stok buku jika status berubah menjadi Dikembalikan
-            if (statusLama === 'Dipinjam' && (statusBaru === 'Dikembalikan' || statusBaru === 'Hilang')) {
-                const buku = dataBuku.find(b => b.id === item.bukuId);
-                if (buku && statusBaru === 'Dikembalikan') {
-                    buku.stokAda = Math.min(buku.stokTotal, buku.stokAda + 1);
-                }
-            }
-
-            // Hitung Denda Keterlambatan (Rp 1.000 / Hari)
-            if (statusBaru === 'Dikembalikan' && tglKembaliAct) {
-                const tglBatas = new Date(item.tglBatas);
-                const tglKembali = new Date(tglKembaliAct);
-                const diffTime = tglKembali - tglBatas;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays > 0) {
-                    item.denda = diffDays * 1000;
-                } else {
-                    item.denda = 0;
-                }
-            } else if (statusBaru === 'Hilang') {
-                item.denda = item.hargaBuku || 50000; // Denda ganti rugi sebesar harga buku
+            if (gambarInput.files && gambarInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    simpanData(event.target.result);
+                };
+                reader.readAsDataURL(gambarInput.files[0]);
             } else {
-                item.denda = 0;
-            }
-
-            localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
-            localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
-
-            renderKatalog();
-            renderLaporan();
-            closeEditLaporanModal();
-
-            if (confirm("Data pengembalian berhasil diperbarui! Cetak bukti pengembalian?")) {
-                cetakStrukSatuan(index);
+                simpanData(null);
             }
         }
 
-        // FUNGSI HAPUS LAPORAN INDIVIDUAL
-        function hapusLaporan(index) {
-            const item = dataLaporan[index];
-            if (!item) return;
-
-            if (confirm(`Apakah Anda yakin ingin menghapus laporan peminjaman siswa ${item.namaSiswa}?`)) {
-                // Restore stok buku jika masih dipinjam saat dihapus
-                if (item.status === 'Dipinjam') {
-                    const buku = dataBuku.find(b => b.id === item.bukuId);
-                    if (buku) {
-                        buku.stokAda = Math.min(buku.stokTotal, buku.stokAda + 1);
-                        localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
-                    }
-                }
-
-                dataLaporan.splice(index, 1);
-                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
-                renderKatalog();
-                renderLaporan();
-            }
-        }
-
-        function clearLaporan() {
-            if (confirm("Apakah Anda yakin ingin menghapus SELURUH riwayat laporan peminjaman?")) {
-                dataLaporan = [];
-                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
-                renderLaporan();
-            }
-        }
-
-        // FUNGSI CETAK BUKTI PER TRANSAKSI SISWA (KOP SURAT + KETERANGAN PENGEMBALIAN)
-        function cetakStrukSatuan(index) {
-            const item = dataLaporan[index];
-            if (!item) return;
-
-            loadLogoMadrasah();
-
-            document.getElementById('printTitle').innerText = "BUKTI PEMINJAMAN & PENGEMBALIAN BUKU";
-            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('printNamaSiswa').innerText = item.namaSiswa;
-            document.getElementById('printTtdPeminjamLabel').innerText = "Siswa Peminjam,";
-
-            let htmlContent = `
-                <table class="w-full border-collapse my-4 text-xs">
-                    <tr><td class="py-1 w-36 font-semibold">Nomor Transaksi</td><td>: TRX-${item.id}</td></tr>
-                    <tr><td class="py-1 font-semibold">NIS Siswa</td><td>: ${item.nis}</td></tr>
-                    <tr><td class="py-1 font-semibold">Nama Siswa</td><td>: ${item.namaSiswa}</td></tr>
-                    <tr><td class="py-1 font-semibold">Judul Buku</td><td>: <strong>${item.judulBuku}</strong></td></tr>
-                    <tr><td class="py-1 font-semibold">Tanggal Pinjam</td><td>: ${item.tglPinjam}</td></tr>
-                    <tr><td class="py-1 font-semibold">Batas Pengembalian</td><td>: ${item.tglBatas}</td></tr>
-                    <tr><td class="py-1 font-semibold">Status Saat Ini</td><td>: <strong>${item.status.toUpperCase()}</strong></td></tr>
-            `;
-
-            if (item.status === 'Dikembalikan') {
-                htmlContent += `
-                    <tr><td class="py-1 font-semibold">Tanggal Dikembalikan</td><td>: ${item.tglKembaliActual || '-'}</td></tr>
-                    <tr><td class="py-1 font-semibold">Denda Keterlambatan</td><td>: Rp ${(item.denda || 0).toLocaleString('id-ID')}</td></tr>
-                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku telah dikembalikan dalam kondisi baik.</td></tr>
-                `;
-            } else if (item.status === 'Hilang') {
-                htmlContent += `
-                    <tr><td class="py-1 font-semibold">Biaya Ganti Rugi</td><td>: Rp ${(item.denda || 0).toLocaleString('id-ID')}</td></tr>
-                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku dilaporkan hilang dan dalam proses penggantian/ganti rugi.</td></tr>
-                `;
-            } else {
-                htmlContent += `
-                    <tr><td class="py-1 font-semibold">Keterangan</td><td>: Buku dalam masa peminjaman aktif. Harap dikembalikan sebelum tanggal batas.</td></tr>
-                `;
-            }
-
-            htmlContent += `</table>`;
-
-            document.getElementById('printContent').innerHTML = htmlContent;
-            window.print();
-        }
-
-        // FUNGSI CETAK SEMUA LAPORAN TABEL
-        function cetakLaporanSemua() {
-            if (dataLaporan.length === 0) {
-                alert("Tidak ada data laporan untuk dicetak!");
-                return;
-            }
-
-            loadLogoMadrasah();
-
-            document.getElementById('printTitle').innerText = "LAPORAN REKAPITULASI PEMINJAMAN BUKU";
-            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('printNamaSiswa').innerText = "Kepala Perpustakaan";
-            document.getElementById('printTtdPeminjamLabel').innerText = "Mengetahui,";
-
-            let tableRows = dataLaporan.map((item, idx) => `
-                <tr class="border-b text-xs">
-                    <td class="p-1.5 border text-center">${idx + 1}</td>
-                    <td class="p-1.5 border">${item.tglPinjam}</td>
-                    <td class="p-1.5 border">${item.nis} - ${item.namaSiswa}</td>
-                    <td class="p-1.5 border">${item.judulBuku}</td>
-                    <td class="p-1.5 border">${item.tglBatas}</td>
-                    <td class="p-1.5 border">${item.status} ${item.tglKembaliActual ? '(' + item.tglKembaliActual + ')' : ''}</td>
-                    <td class="p-1.5 border text-right">Rp ${(item.denda || 0).toLocaleString('id-ID')}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('printContent').innerHTML = `
-                <table class="w-full border-collapse border my-4 text-xs">
-                    <thead>
-                        <tr class="bg-slate-100 font-bold">
-                            <th class="p-1.5 border">No</th>
-                            <th class="p-1.5 border">Tgl Pinjam</th>
-                            <th class="p-1.5 border">NIS & Nama Siswa</th>
-                            <th class="p-1.5 border">Judul Buku</th>
-                            <th class="p-1.5 border">Batas Kembalian</th>
-                            <th class="p-1.5 border">Status & Tgl Kembali</th>
-                            <th class="p-1.5 border">Denda</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-            `;
-
-            window.print();
-        }
-
-        // AKSI SEARCH & FILTER
+        // FUNGSI FILTER SEARCH BUKU
         function filterBuku() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
             const filtered = dataBuku.filter(b => 
-                b.judul.toLowerCase().includes(query) ||
-                b.penulis.toLowerCase().includes(query) ||
-                b.kategori.toLowerCase().includes(query)
+                b.judul.toLowerCase().includes(keyword) || 
+                b.penulis.toLowerCase().includes(keyword) || 
+                b.kategori.toLowerCase().includes(keyword)
             );
             renderKatalog(filtered);
         }
 
-        // LOGIN & ADMIN AUTHENTICATION
+        // LOGIKA AUTHENTIKASI ADMIN
         function handleAuthClick() {
             if (isAdminLoggedIn) {
-                if (confirm("Apakah Anda yakin ingin logout dari Mode Admin?")) {
+                if (confirm("Apakah Anda yakin ingin logout dari Panel Admin?")) {
                     isAdminLoggedIn = false;
-                    sessionStorage.removeItem('mi_admin_login');
+                    sessionStorage.setItem('mi_admin_login', 'false');
                     updateAdminStateUI();
                 }
             } else {
@@ -919,17 +668,17 @@
 
         function submitLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('loginUsername').value;
-            const pass = document.getElementById('loginPassword').value;
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
 
-            if (user === ADMIN_USERNAME && pass === ADMIN_PASSWORD) {
+            if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
                 isAdminLoggedIn = true;
                 sessionStorage.setItem('mi_admin_login', 'true');
                 updateAdminStateUI();
                 closeLoginModal();
                 alert("Login Admin Berhasil!");
             } else {
-                alert("Username atau Password Admin salah!");
+                alert("Username atau Password Admin Salah!");
             }
         }
 
@@ -944,46 +693,261 @@
                 adminPanel.classList.add('hidden');
                 authBtnText.innerText = "Login Admin";
             }
+            renderKatalog();
+            renderLaporan();
         }
 
-        function tambahBuku(e) {
-            e.preventDefault();
-            const judul = document.getElementById('addJudul').value.trim();
-            const penulis = document.getElementById('addPenulis').value.trim();
-            const kategori = document.getElementById('addKategori').value;
-            const stok = parseInt(document.getElementById('addStok').value);
-            const harga = parseInt(document.getElementById('addHarga').value);
-            const fileGambar = document.getElementById('addGambar').files[0];
+        // LOGIKA MODAL PEMINJAMAN
+        function bukaModalPinjam(id) {
+            const buku = dataBuku.find(b => b.id === id);
+            if (!buku) return;
 
-            let defaultImg = "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=400&auto=format&fit=crop";
+            document.getElementById('modalBukuId').value = buku.id;
+            document.getElementById('modalJudulBuku').value = buku.judul;
+            document.getElementById('pinjamModal').classList.remove('hidden');
+        }
 
-            const saveBukuObj = (imgUrl) => {
-                const bukuBaru = {
-                    id: Date.now(),
-                    judul: judul,
-                    penulis: penulis,
-                    kategori: kategori,
-                    stokTotal: stok,
-                    stokAda: stok,
-                    harga: harga,
-                    gambar: imgUrl
-                };
-                dataBuku.unshift(bukuBaru);
-                localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
-                renderKatalog();
-                e.target.reset();
-                alert("Buku baru berhasil ditambahkan!");
-            };
+        function closePinjamModal() {
+            stopScanner();
+            document.getElementById('pinjamModal').classList.add('hidden');
+            document.getElementById('formPinjam').reset();
+        }
 
-            if (fileGambar) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    saveBukuObj(event.target.result);
-                };
-                reader.readAsDataURL(fileGambar);
-            } else {
-                saveBukuObj(defaultImg);
+        function startScanner() {
+            const readerDiv = document.getElementById('reader');
+            readerDiv.classList.remove('hidden');
+
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((decodedText) => {
+                document.getElementById('nisInput').value = decodedText;
+                stopScanner();
+            }, (error) => {});
+        }
+
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+                document.getElementById('reader').classList.add('hidden');
             }
+        }
+
+        function submitPeminjaman(e) {
+            e.preventDefault();
+            const idBuku = parseInt(document.getElementById('modalBukuId').value);
+            const nis = document.getElementById('nisInput').value;
+            const nama = document.getElementById('namaSiswaInput').value;
+            const lamaPinjam = parseInt(document.getElementById('lamaPinjamInput').value);
+
+            const bukuIndex = dataBuku.findIndex(b => b.id === idBuku);
+            if (bukuIndex !== -1 && dataBuku[bukuIndex].stokAda > 0) {
+                dataBuku[bukuIndex].stokAda -= 1;
+                localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+
+                const now = new Date();
+                const tglPinjam = now.toISOString().split('T')[0];
+                const tglBatas = new Date(now.setDate(now.getDate() + lamaPinjam)).toISOString().split('T')[0];
+
+                const laporanBaru = {
+                    id: Date.now(),
+                    bukuId: idBuku,
+                    judulBuku: dataBuku[bukuIndex].judul,
+                    hargaBuku: dataBuku[bukuIndex].harga,
+                    nis: nis,
+                    namaSiswa: nama,
+                    tglPinjam: tglPinjam,
+                    tglBatas: tglBatas,
+                    tglKembali: null,
+                    status: 'Dipinjam',
+                    denda: 0
+                };
+
+                dataLaporan.unshift(laporanBaru);
+                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+
+                renderKatalog();
+                renderLaporan();
+                closePinjamModal();
+
+                cetakStruk(laporanBaru);
+            }
+        }
+
+        // LOGIKA LAPORAN PEMINJAMAN
+        function renderLaporan() {
+            const tbody = document.getElementById('tabelLaporan');
+            tbody.innerHTML = '';
+
+            document.getElementById('totalTransaksi').innerText = dataLaporan.length;
+
+            dataLaporan.forEach(item => {
+                let statusBadge = '';
+                if (item.status === 'Dipinjam') {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold text-[10px]">Dipinjam</span>`;
+                } else if (item.status === 'Dikembalikan') {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold text-[10px]">Kembali</span>`;
+                } else {
+                    statusBadge = `<span class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-semibold text-[10px]">Hilang</span>`;
+                }
+
+                let dendaText = item.denda > 0 ? `<br><span class="text-red-500 font-bold">Denda: Rp ${item.denda.toLocaleString('id-ID')}</span>` : '';
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-2">${item.tglPinjam}</td>
+                    <td class="p-2 font-medium">${item.namaSiswa}<br><span class="text-slate-400">${item.nis}</span></td>
+                    <td class="p-2 font-semibold text-emerald-800">${item.judulBuku}</td>
+                    <td class="p-2">${item.tglKembali || item.tglBatas}</td>
+                    <td class="p-2">${statusBadge} ${dendaText}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="bukaModalEditLaporan(${item.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Status">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="cetakStrukById(${item.id})" class="text-emerald-600 hover:text-emerald-800 p-1" title="Cetak Bukti">
+                            <i class="fa-solid fa-print"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function bukaModalEditLaporan(id) {
+            const item = dataLaporan.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('editLaporanId').value = item.id;
+            document.getElementById('editNamaSiswa').value = `${item.namaSiswa} (${item.nis})`;
+            document.getElementById('editJudulBuku').value = item.judulBuku;
+            document.getElementById('editStatusSelect').value = item.status;
+            document.getElementById('editTglKembaliInput').value = item.tglKembali || new Date().toISOString().split('T')[0];
+
+            document.getElementById('editLaporanModal').classList.remove('hidden');
+        }
+
+        function closeEditLaporanModal() {
+            document.getElementById('editLaporanModal').classList.add('hidden');
+        }
+
+        function submitEditLaporan(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editLaporanId').value);
+            const status = document.getElementById('editStatusSelect').value;
+            const tglKembali = document.getElementById('editTglKembaliInput').value;
+
+            const index = dataLaporan.findIndex(l => l.id === id);
+            if (index !== -1) {
+                const oldStatus = dataLaporan[index].status;
+                dataLaporan[index].status = status;
+
+                if (status === 'Dikembalikan') {
+                    dataLaporan[index].tglKembali = tglKembali;
+                    
+                    // Kembalikan stok jika sebelumnya status dipinjam
+                    if (oldStatus === 'Dipinjam') {
+                        const bIndex = dataBuku.findIndex(b => b.id === dataLaporan[index].bukuId);
+                        if (bIndex !== -1) {
+                            dataBuku[bIndex].stokAda += 1;
+                            localStorage.setItem('mi_buku', JSON.stringify(dataBuku));
+                        }
+                    }
+
+                    // Hitung Denda (Rp 1.000 / hari keterlambatan)
+                    const d1 = new Date(dataLaporan[index].tglBatas);
+                    const d2 = new Date(tglKembali);
+                    const diffTime = d2 - d1;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    dataLaporan[index].denda = diffDays > 0 ? diffDays * 1000 : 0;
+
+                } else if (status === 'Hilang') {
+                    dataLaporan[index].denda = dataLaporan[index].hargaBuku || 50000;
+                }
+
+                localStorage.setItem('mi_laporan', JSON.stringify(dataLaporan));
+                renderKatalog();
+                renderLaporan();
+                closeEditLaporanModal();
+                alert("Status Laporan Berhasil Diperbarui!");
+            }
+        }
+
+        function clearLaporan() {
+            if (confirm("Apakah Anda yakin ingin menghapus seluruh data laporan peminjaman?")) {
+                dataLaporan = [];
+                localStorage.removeItem('mi_laporan');
+                renderLaporan();
+            }
+        }
+
+        // LOGIKA CETAK STRUK & LAPORAN
+        function cetakStrukById(id) {
+            const item = dataLaporan.find(l => l.id === id);
+            if (item) cetakStruk(item);
+        }
+
+        function cetakStruk(item) {
+            document.getElementById('printTitle').innerText = "BUKTI PEMINJAMAN / PENGEMBALIAN BUKU";
+            document.getElementById('printNamaSiswa').innerText = item.namaSiswa;
+            document.getElementById('printTtdPeminjamLabel').innerText = "Siswa Peminjam,";
+            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID');
+
+            const printContent = document.getElementById('printContent');
+            printContent.innerHTML = `
+                <table class="w-full my-4 border-collapse">
+                    <tr><td class="py-1 w-1/3 font-semibold">Nama Siswa</td><td>: ${item.namaSiswa}</td></tr>
+                    <tr><td class="py-1 font-semibold">NIS</td><td>: ${item.nis}</td></tr>
+                    <tr><td class="py-1 font-semibold">Judul Buku</td><td>: ${item.judulBuku}</td></tr>
+                    <tr><td class="py-1 font-semibold">Tanggal Pinjam</td><td>: ${item.tglPinjam}</td></tr>
+                    <tr><td class="py-1 font-semibold">Batas Pengembalian</td><td>: ${item.tglBatas}</td></tr>
+                    <tr><td class="py-1 font-semibold">Tanggal Dikembalikan</td><td>: ${item.tglKembali || '-'}</td></tr>
+                    <tr><td class="py-1 font-semibold">Status Saat Ini</td><td>: <strong>${item.status}</strong></td></tr>
+                    <tr><td class="py-1 font-semibold">Denda / Ganti Rugi</td><td>: Rp ${(item.denda || 0).toLocaleString('id-ID')}</td></tr>
+                </table>
+            `;
+
+            window.print();
+        }
+
+        function cetakLaporanSemua() {
+            document.getElementById('printTitle').innerText = "LAPORAN REKAPITULASI PEMINJAMAN BUKU";
+            document.getElementById('printNamaSiswa').innerText = "Kepala Perpustakaan";
+            document.getElementById('printTtdPeminjamLabel').innerText = "Mengetahui,";
+            document.getElementById('printTanggalCetak').innerText = new Date().toLocaleDateString('id-ID');
+
+            let tableHtml = `
+                <table class="w-full my-4 border-collapse border border-slate-400 text-xs text-left">
+                    <thead>
+                        <tr class="bg-slate-200">
+                            <th class="border border-slate-400 p-1.5">No</th>
+                            <th class="border border-slate-400 p-1.5">Tgl Pinjam</th>
+                            <th class="border border-slate-400 p-1.5">Siswa (NIS)</th>
+                            <th class="border border-slate-400 p-1.5">Judul Buku</th>
+                            <th class="border border-slate-400 p-1.5">Tgl Kembali</th>
+                            <th class="border border-slate-400 p-1.5">Status</th>
+                            <th class="border border-slate-400 p-1.5">Denda</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            dataLaporan.forEach((item, index) => {
+                tableHtml += `
+                    <tr>
+                        <td class="border border-slate-400 p-1.5 text-center">${index + 1}</td>
+                        <td class="border border-slate-400 p-1.5">${item.tglPinjam}</td>
+                        <td class="border border-slate-400 p-1.5">${item.namaSiswa} (${item.nis})</td>
+                        <td class="border border-slate-400 p-1.5">${item.judulBuku}</td>
+                        <td class="border border-slate-400 p-1.5">${item.tglKembali || item.tglBatas}</td>
+                        <td class="border border-slate-400 p-1.5">${item.status}</td>
+                        <td class="border border-slate-400 p-1.5">Rp ${(item.denda || 0).toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `</tbody></table>`;
+            document.getElementById('printContent').innerHTML = tableHtml;
+
+            window.print();
         }
     </script>
 </body>
